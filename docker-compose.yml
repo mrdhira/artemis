@@ -10,3 +10,8 @@ services:
       - ${HOME}/storage/artemis/public/pictures:/usr/src/app/public/pictures
     networks: 
       - database
+
+networks: 
+  database:
+    external: 
+      name: database

@@ -3,6 +3,7 @@ version: '3.7'
 services: 
   artemis:
     container_name: artemis
+    image: dhirawigata/artemis
     build: .
     env_file:
       - ${HOME}/env/artemis/.env

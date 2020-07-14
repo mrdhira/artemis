@@ -8,6 +8,9 @@ services:
       - ${HOME}/env/artemis/.env
     volumes: 
       - ${HOME}/storage/artemis/public/pictures:/usr/src/app/public/pictures
+      # - ${HOME}/env/artemis/.env:/usr/src/app/.env
+    ports:
+      - 3000:3000
     networks: 
       - database
 

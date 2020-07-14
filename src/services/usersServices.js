@@ -130,7 +130,15 @@ exports.getProfileMerchant = async (sql, id, merchant_id) => {
     const user = await repository.users.getUserByID(sql, id)
     const merchant = await repository.merchants.getMerchantsByID(sql, merchant_id)
     const merchantServices = await repository.merchants.getMerchantsTreatmentsByMerchantID(sql, merchant_id)
-    return { user, merchant, merchantServices }
+    let pictures = {}
+    if (user.picture_id) {
+        pictures = await repository.pictures.getById(sql, user.picture_id)
+        pictures.file = null
+        if (pictures.url) {
+            pictures.file = await helpers.readFile(pictures.url)
+        }
+    }
+    return { user, merchant, merchantServices, pictures }
 }
 
 /**

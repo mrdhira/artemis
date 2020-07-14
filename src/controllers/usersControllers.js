@@ -5,6 +5,8 @@ const USER_DATA = [
     'full_name',
     'email',
     'phone',
+    'birth_date',
+    'birth_place'
 ]
 
 const MERCHANT_DATA = [

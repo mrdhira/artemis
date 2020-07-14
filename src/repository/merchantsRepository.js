@@ -6,9 +6,12 @@ exports.getAllMerchants = (sql) => {
             .query(`
                 SELECT A.id, A.picture_id, A.full_name, A.email, A.phone
                 , B.id AS "merchant_id", B.address, B.operational_hour, B.facility, B.latitude, B.longtitude
+                , C.url
                 FROM users AS A
                 JOIN user_merchants AS B
-                ON A.id = B.user_id`)
+                ON A.id = B.user_id
+                LEFT JOIN pictures AS C
+                ON A.picture_id = C.id`)
             .then(data => data.rows ? data.rows : [])
     } catch (err) {
         throw err;

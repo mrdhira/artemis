@@ -6,7 +6,16 @@ const repository = require('../repository');
  * @param {*} res
  */
 exports.getMerchantsList = async (sql) => {
-    return repository.merchants.getAllMerchants(sql);
+    const result = []
+    const merchantList = await repository.merchants.getAllMerchants(sql);
+    for (let merchant of merchantList) {
+        merchant.file = null
+        if (merchant.picture_id && merchant.url) {
+            pictures.file = await helpers.readFile(pictures.url)
+        }
+        result.push(merchant)
+    }
+    return result;
 }
 
 /**
@@ -22,5 +31,13 @@ exports.getMerchantsDetail = async (sql, id) => {
 
     const merchantServices = await repository.merchants.getMerchantsTreatmentsByMerchantID(sql, id)
     const user = await repository.users.getUserByID(sql, merchant.user_id)
-    return { user, merchant, merchantServices }
+    let pictures = {}
+    if (user.picture_id) {
+        pictures = await repository.pictures.getById(sql, user.picture_id)
+        pictures.file = null
+        if (pictures.url) {
+            pictures.file = await helpers.readFile(pictures.url)
+        }
+    }
+    return { user, merchant, merchantServices, pictures }
 }

@@ -5,8 +5,18 @@ const repository = require('../repository');
  * @param {*} req 
  * @param {*} res 
  */
-exports.getPetsList = (sql, user_id) => {
-    return repository.pets.getPetsByUserID(sql, user_id)
+exports.getPetsList = async (sql, user_id) => {
+    const pets = await repository.pets.getPetsByUserID(sql, user_id)
+    let pictures = {}
+    if (pets.picture_id) {
+        pictures = await repository.pictures.getById(sql, pets.picture_id)
+        pictures.file = null
+        if (pictures.url) {
+            pictures.file = await helpers.readFile(pictures.url)
+        }
+    }
+
+    return { pets, pictures }
 }
 
 /**
@@ -14,8 +24,17 @@ exports.getPetsList = (sql, user_id) => {
  * @param {*} req 
  * @param {*} res 
  */
-exports.getPetsDetail = (sql, id) => {
-    return repository.pets.getPetsByID(sql, id)
+exports.getPetsDetail = async (sql, id) => {
+    const pets = await repository.pets.getPetsByID(sql, id)
+    let pictures = {}
+    if (pets.picture_id) {
+        pictures = await repository.pictures.getById(sql, pets.picture_id)
+        pictures.file = null
+        if (pictures.url) {
+            pictures.file = await helpers.readFile(pictures.url)
+        }
+    }
+    return { pets, pictures }
 }
 
 /**

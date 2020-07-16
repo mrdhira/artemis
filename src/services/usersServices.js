@@ -115,7 +115,7 @@ exports.changePassword = async (sql, id, oldPassword, newPasswoord) => {
         return { passwordNotMatch: true }
     }
 
-    const update = await repository.users.updateUser(sql, id, { password: newPasswoord, update_at: new Date() })
+    const update = await repository.users.updateUser(sql, id, { password: newPasswoord, updated_at: new Date() })
     console.log('updatePassword: ', update);
 
     return 1

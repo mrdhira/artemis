@@ -24,7 +24,7 @@ exports.validateToken = async (req, res, done) => {
             ? req.body.decoded = decoded
             : req.body = { decoded }
 
-        done()
+        return done()
     } catch (err) {
         console.log('ErrValidateToken: ', err)
         if (err.name == 'TokenExpiredError') {

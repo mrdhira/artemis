@@ -16,7 +16,7 @@ exports.getOrdersList = async (req, res) => {
         const orderList = await services.orders.getOrderList(req.sql, id, user_type)
 
         return helpers.response(res, 200, 'OK', false, orderList)
-    } catch (error) {
+    } catch (err) {
         console.error(err)
         return helpers.response(res, 500, 'Internal server error.', true, {})
     }
@@ -29,8 +29,16 @@ exports.getOrdersList = async (req, res) => {
  */
 exports.getOrdersDetail = async (req, res) => {
     console.log('request body: ', req.body);
+    console.log('request parameter: ', req.params)
+    const { id } = req.params;
 
-    return helpers.response(res, 200, 'OK', false, {})
+    try {
+        const orders = await services.orders.getOrdersDetail(req.sql, id)
+        return helpers.response(res, 200, 'OK', false, orders)
+    } catch (err) {
+        console.error(err)
+        return helpers.response(res, 500, 'Internal server error.', true, {})
+    }
 }
 
 /**

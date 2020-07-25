@@ -24,8 +24,18 @@ exports.getOrderList = async (sql, id, user_type) => {
  * @param {*} req 
  * @param {*} res 
  */
-exports.getOrdersDetail = async (sql) => {
-    return 1
+exports.getOrdersDetail = async (sql, id) => {
+    const orders = await repository.orders.getOrdersByID(sql, id)
+    orders.order_pets = []
+    const order_pets = await repository.orders.getOrderPetsByOrderID(sql, orders.id)
+    for (const order_pet of order_pets) {
+        order_pet_services = await repository.orders.getOrderPetServicesByOrderPetID(sql, order_pet.id)
+        orders.order_pets.push({
+            ...order_pet,
+            order_pet_services
+        })
+    }
+    return orders
 }
 
 /**

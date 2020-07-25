@@ -1,7 +1,13 @@
 const queryHelpers = require('../helpers').query
 
 exports.getOrdersByID = (sql, id) => {
-
+    try {
+        return sql
+            .query('SELECT * FROM orders WHERE id = $1', [id])
+            .then(data => data.rows ? data.rows[0] : {})
+    } catch (err) {
+        throw err
+    }
 }
 
 exports.getOrdersByUserID = (sql, user_id) => {
@@ -49,11 +55,23 @@ exports.getOrdersByConditional = (sql, where) => {
 }
 
 exports.getOrderPetsByOrderID = (sql, order_id) => {
-
+    try {
+        return sql
+            .query('SELECT * FROM order_pets WHERE order_id = $1', [order_id])
+            .then(data => data.rows ? data.rows : [])
+    } catch (err) {
+        throw err
+    }
 }
 
-exports.getOrderPetServicesByOrderID = (sql, order_id) => {
-
+exports.getOrderPetServicesByOrderPetID = (sql, order_pet_id) => {
+    try {
+        return sql
+            .query('SELECT * FROM order_pet_services WHERE order_pet_id = $1', [order_pet_id])
+            .then(data => data.rows ? data.rows : [])
+    } catch (err) {
+        throw err
+    }
 }
 
 exports.createOrders = async (sql, customer_id, merchant_id, booking_datetime, amount, status) => {

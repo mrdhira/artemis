@@ -4,14 +4,10 @@ exports.getOrdersByID = (sql, id) => {
     try {
         return sql
             .query('SELECT * FROM orders WHERE id = $1', [id])
-            .then(data => data.rows ? data.rows[0] : {})
+            .then(data => data.rows ? data.rows[0] : null)
     } catch (err) {
         throw err
     }
-}
-
-exports.getOrdersByUserID = (sql, user_id) => {
-    
 }
 
 exports.getOrderListByCustomerID = (sql, customer_id, status) => {
@@ -120,17 +116,35 @@ exports.createOrderPetService = async (sql, order_pet_id, merchant_service_id, s
 }
 
 exports.updateStatusOrders = (sql, id, status) => {
-
+    try {
+        return sql
+            .query(queryHelpers.updateQuery({status}, 'orders', {id}), [status])
+    } catch (err) {
+        throw err
+    }
 }
 
-exports.insertOrderPets = (sql, data) => {
-
+exports.insertOrderReviews = (sql, order_id, rating, description) => {
+    try {
+        return sql
+            .query(
+                queryHelpers
+                    .insertQuery(
+                        {order_id, rating, description}, 'order_reviews'),
+                        [order_id, rating, description]
+            )
+            .then(data => data.rows[0])
+    } catch (err) {
+        throw err
+    }
 }
 
-exports.insertOrderPetServices = (sql, data) => {
-
-}
-
-exports.insertOrderReviews = (sql, data) => {
-    
+exports.getOrderReviewsByOrderID = (sql, order_id) => {
+    try {
+        return sql
+            .query('SELECT * FROM order_reviews WHERE order_id = $1', [order_id])
+            .then(data => data.rows && data.rows.length != 0 ? data.rows : null)
+    } catch (err) {
+        throw err
+    }
 }

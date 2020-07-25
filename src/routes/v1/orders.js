@@ -25,27 +25,6 @@ module.exports = (fastify, options, next) => {
 
     fastify.route({
         method: 'PUT',
-        url: '/approve',
-        preHandler: (req, res, done) => authHelpers.validateToken(req, res, done),
-        handler: (req, res) => controllers.orders.approveOrders(req, res),
-    })
-
-    fastify.route({
-        method: 'PUT',
-        url: '/reject',
-        preHandler: (req, res, done) => authHelpers.validateToken(req, res, done),
-        handler: (req, res) => controllers.orders.rejectOrders(req, res),
-    })
-
-    fastify.route({
-        method: 'PUT',
-        url: '/complete',
-        preHandler: (req, res, done) => authHelpers.validateToken(req, res, done),
-        handler: (req, res) => controllers.orders.completeOrders(req, res),
-    })
-
-    fastify.route({
-        method: 'PUT',
         url: '/status',
         preHandler: (req, res, done) => authHelpers.validateToken(req, res, done),
         handler: (req, res) => controllers.orders.updateStatusOrders(req, res),

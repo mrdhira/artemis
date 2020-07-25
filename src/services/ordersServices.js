@@ -25,17 +25,27 @@ exports.getOrderList = async (sql, id, user_type) => {
  * @param {*} res 
  */
 exports.getOrdersDetail = async (sql, id) => {
-    const orders = await repository.orders.getOrdersByID(sql, id)
-    orders.order_pets = []
-    const order_pets = await repository.orders.getOrderPetsByOrderID(sql, orders.id)
-    for (const order_pet of order_pets) {
-        order_pet_services = await repository.orders.getOrderPetServicesByOrderPetID(sql, order_pet.id)
-        orders.order_pets.push({
-            ...order_pet,
-            order_pet_services
-        })
+    try {
+        const orders = await repository.orders.getOrdersByID(sql, id)
+        if (!orders) {
+            return { ordersNotFound: true }
+        } else {
+            orders.order_pets = []
+            const order_pets = await repository.orders.getOrderPetsByOrderID(sql, orders.id)
+            for (const order_pet of order_pets) {
+                order_pet_services = await repository.orders.getOrderPetServicesByOrderPetID(sql, order_pet.id)
+                orders.order_pets.push({
+                    ...order_pet,
+                    order_pet_services
+                })
+            }
+            const reviews = await repository.orders.getOrderReviewsByOrderID(sql, orders.id)
+            orders.reviews = reviews ? reviews : {}
+            return orders
+        }
+    } catch (err) {
+        throw err
     }
-    return orders
 }
 
 /**
@@ -117,35 +127,29 @@ exports.createOrders = async (sql, id, merchant_id, booking_datetime, pets) => {
  * @param {*} req 
  * @param {*} res 
  */
-exports.approveOrders = async (sql) => {
-    return 1
-}
-
-/**
- * 
- * @param {*} req 
- * @param {*} res 
- */
-exports.rejectOrders = async (sql) => {
-    return 1
-}
-
-/**
- * 
- * @param {*} req 
- * @param {*} res 
- */
-exports.completeOrders = async (sql) => {
-    return 1
-}
-
-/**
- * 
- * @param {*} req 
- * @param {*} res 
- */
-exports.updateStatusOrders = async (sql) => {
-    return 1
+exports.updateStatusOrders = async (sql, id, status) => {
+    try {
+        const orders = await repository.orders.getOrdersByID(sql, id)
+        if (!orders) {
+            return { ordersNotFound: true }
+        } else {
+            console.log(`Checking orders status condition: Orders Status: ${orders.status}, Status: ${status}`)
+            if (orders.status === 3 || orders.status === 5) {
+                return { ordersCompleted: true }
+            } else if (
+                (orders.status === 1 && (status !== 2 && status !== 3))
+                || (orders.status === 2 && status !== 4)
+                || (orders.status === 4 && status !== 5)
+            ) {
+                return { ordersStatusInvalid: true}
+            } else {
+                await repository.orders.updateStatusOrders(sql, id, status)
+                return 1
+            }
+        }
+    } catch (err) {
+        throw err
+    }
 }
 
 /**
@@ -162,6 +166,26 @@ exports.addPetMedicalRecords = async (sql) => {
  * @param {*} req 
  * @param {*} res 
  */
-exports.giveOrdersRatings = async (sql) => {
-    return 1
+exports.giveOrdersRatings = async (sql, order_id, rating, description) => {
+    try {
+        const orders = await repository.orders.getOrdersByID(sql, order_id)
+        if (!orders) {
+            return { ordersNotFound: true }
+        } else {
+            if (orders.status !== 5) {
+                return { ordersNotCompleted: true }
+            } else {
+                const getReviews = await repository.orders.getOrderReviewsByOrderID(sql, order_id)
+                console.log('Get Reviews: ', getReviews)
+                if (getReviews) {
+                    return { alreadyGiven: true }
+                } else {
+                    await repository.orders.insertOrderReviews(sql, order_id, rating, description)
+                    return 1
+                }
+            }
+        }
+    } catch (err) {
+        throw err
+    }
 }

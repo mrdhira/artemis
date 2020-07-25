@@ -8,7 +8,7 @@ exports.insertQuery = (data, table) => {
     }
   
     query = query.substr(0, query.length - 1)
-    return `INSERT INTO ${table} (${keys.join(',')}) VALUES (${query})`
+    return `INSERT INTO ${table} (${keys.join(',')}) VALUES (${query}) RETURNING *`
 }
   
   exports.updateQuery = (data, table, where) => {

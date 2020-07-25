@@ -24,7 +24,6 @@ exports.validateToken = async (req, res, done) => {
             ? req.body.decoded = decoded
             : req.body = { decoded }
 
-        // return done()
         return
     } catch (err) {
         console.log('ErrValidateToken: ', err)

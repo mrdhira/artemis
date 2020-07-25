@@ -11,13 +11,6 @@ module.exports = (fastify, options, next) => {
 
     fastify.route({
         method: 'GET',
-        url: '/history',
-        preHandler: (req, res, done) => authHelpers.validateToken(req, res, done),
-        handler: (req, res) => controllers.orders.getOrdersHistoryList(req, res),
-    })
-
-    fastify.route({
-        method: 'GET',
         url: '/:id',
         preHandler: (req, res, done) => authHelpers.validateToken(req, res, done),
         handler: (req, res) => controllers.orders.getOrdersDetail(req, res),

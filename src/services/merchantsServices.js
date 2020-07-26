@@ -12,7 +12,7 @@ exports.getMerchantsList = async (sql) => {
     for (let merchant of merchantList) {
         merchant.file = null
         if (merchant.picture_id && merchant.url) {
-            pictures.file = await helpers.readFile(pictures.url)
+            merchant.file = await helpers.readFile(merchant.url)
         }
         result.push(merchant)
     }

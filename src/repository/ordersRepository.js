@@ -15,10 +15,12 @@ exports.getOrderListByCustomerID = (sql, customer_id, status) => {
         return sql
             .query(`
                 SELECT A.id, A.customer_id, A.merchant_id, A.booking_datetime, A.status, A.created_at, A.updated_at
-                , B.full_name AS "merchant_name", B.phone
+                , C.full_name AS "merchant_name", C.phone
                 FROM orders AS A
-                JOIN users AS B
+                JOIN user_merchants AS B
                     ON A.merchant_id = B.id
+                JOIN users AS C
+                    ON B.user_id = C.id
                 WHERE A.customer_id = $1 AND status IN(${status})
                 `,
             [customer_id])
@@ -46,14 +48,10 @@ exports.getOrderListByMerchantID = (sql, merchant_id, status) => {
     }
 }
 
-exports.getOrdersByConditional = (sql, where) => {
-
-}
-
 exports.getOrderPetsByOrderID = (sql, order_id) => {
     try {
         return sql
-            .query('SELECT * FROM order_pets WHERE order_id = $1', [order_id])
+            .query('SELECT * FROM order_pets WHERE order_id = $1 AND status = 1', [order_id])
             .then(data => data.rows ? data.rows : [])
     } catch (err) {
         throw err
@@ -63,7 +61,7 @@ exports.getOrderPetsByOrderID = (sql, order_id) => {
 exports.getOrderPetServicesByOrderPetID = (sql, order_pet_id) => {
     try {
         return sql
-            .query('SELECT * FROM order_pet_services WHERE order_pet_id = $1', [order_pet_id])
+            .query('SELECT * FROM order_pet_services WHERE order_pet_id = $1 AND status = 1', [order_pet_id])
             .then(data => data.rows ? data.rows : [])
     } catch (err) {
         throw err
@@ -144,6 +142,91 @@ exports.getOrderReviewsByOrderID = (sql, order_id) => {
         return sql
             .query('SELECT * FROM order_reviews WHERE order_id = $1', [order_id])
             .then(data => data.rows && data.rows.length != 0 ? data.rows : null)
+    } catch (err) {
+        throw err
+    }
+}
+
+exports.getOrderPetServicesByID = (sql, id) => {
+    try {
+        return sql
+            .query('SELECT * FROM order_pet_services WHERE id = $1 LIMIT 1', [id])
+            .then(data => data.rows && data.rows.length != 0 ? data.rows[0] : null)
+    } catch (err) {
+        throw err
+    }
+}
+
+exports.getOrdersByOrderPetIDAndMerchantID = (sql, order_pet_id, merchant_id) => {
+    try {
+        return sql
+            .query(`
+                SELECT A.id AS "order_id", A.customer_id, A.merchant_id
+                    , B.id AS "order_pet_id"
+                FROM orders AS A
+                JOIN order_pets AS B
+                    ON A.id = B.order_id
+                WHERE A.merchant_id = $1 AND B.id = $2
+            `, [merchant_id, order_pet_id])
+            .then(data => data.rows && data.rows.length != 0 ? data.rows[0] : null)
+    } catch (err) {
+        throw err
+    }
+}
+
+exports.updateOrderPetServices = (sql, id, data) => {
+    try {
+        return sql
+            .query(queryHelpers.updateQuery(data, 'order_pet_services', {id}), Object.values(data))
+            .then(() => {
+                return this.getOrderPetServicesByID(sql, id)
+            })
+    } catch (err) {
+        throw err
+    }
+}
+
+exports.recalculateOrderPetAmountByOrderID = (sql, order_id) => {
+    try {
+        return sql
+            .query(`
+                SELECT DISTINCT
+
+            `)
+    } catch (err) {
+        throw err
+    }
+}
+
+exports.getOrderPetsByID = (sql, id) => {
+    try {
+        return sql
+            .query('SELECT * FROM order_pets WHERE id = $1 LIMIT 1', [id])
+            .then(data => data.rows && data.rows.length != 0 ? data.rows[0] : null)
+    } catch (err) {
+        throw err
+    }
+}
+
+exports.updateOrderPets = (sql, id, data) => {
+    try {
+        return sql
+            .query(queryHelpers.updateQuery(data, 'order_pets', {id}), Object.values(data))
+            .then(() => {
+                return this.getOrderPetsByID(sql, id)
+            })
+    } catch (err) {
+        throw err
+    }
+}
+
+exports.updateOrders = (sql, id, data) => {
+    try {
+        return sql
+            .query(queryHelpers.updateQuery(data, 'orders', {id}), Object.values(data))
+            .then(() => {
+                return this.getOrdersByID(sql, id)
+            })
     } catch (err) {
         throw err
     }

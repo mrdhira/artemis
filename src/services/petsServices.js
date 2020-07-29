@@ -7,17 +7,22 @@ const repository = require('../repository');
  * @param {*} res 
  */
 exports.getPetsList = async (sql, user_id) => {
+    const result = []
     const pets = await repository.pets.getPetsByUserID(sql, user_id)
-    let pictures = {}
-    if (pets.picture_id) {
-        pictures = await repository.pictures.getById(sql, pets.picture_id)
-        pictures.file = null
-        if (pictures.url) {
-            pictures.file = await helpers.readFile(pictures.url)
+    for (const pet of pets) {
+        let pictures = {}
+        if (pet.picture_id) {
+            pictures = await repository.pictures.getById(sql, pet.picture_id)
+            pictures.file = null
+            if (pictures.url) {
+                pictures.file = await helpers.readFile(pictures.url)
+            }
         }
+
+        result.push({...pet, pictures})
     }
 
-    return { pets, pictures }
+    return result
 }
 
 /**

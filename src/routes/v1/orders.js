@@ -44,5 +44,12 @@ module.exports = (fastify, options, next) => {
         handler: (req, res) => controllers.orders.giveOrdersRatings(req, res),
     })
 
+    fastify.route({
+        method: 'PUT',
+        url: '/update',
+        preHandler: (req, res, done) => authHelpers.validateToken(req, res, done),
+        handler: (req, res) => controllers.orders.updateTreatmentOrders(req, res),
+    })
+
     next()
 }

@@ -39,6 +39,14 @@ exports.register = async (req, res) => {
     try {
         const data = await services.users.register(req.sql, full_name, email, phone, password, type)
         if (data) {
+            const tokenData = {
+                id: data.user.id,
+                email,
+            }
+            data.merchants ? tokenData.merchant_id = data.merchants.id : false
+            const token = await helpers.auth.generateToken(tokenData);
+            data.token = token
+
             return helpers.response(res, 200, 'OK', false, data);
         } else {
             return helpers.response(res, 422, 'User already exists.', false, {});
@@ -71,8 +79,8 @@ exports.login = async (req, res) => {
                 email,
             }
             data.merchants ? tokenData.merchant_id = data.merchants.id : false
-
             const token = await helpers.auth.generateToken(tokenData);
+
             return helpers.response(res, 200, 'Login successfully.', false, {token});
         } else {
             return helpers.response(res, 404, 'User not found.', false, {})

@@ -189,3 +189,69 @@ exports.giveOrdersRatings = async (sql, order_id, rating, description) => {
         throw err
     }
 }
+
+exports.updateTreatmentOrders = async (sql, merchant_id, created, updated, deleted, unique_order_pet_id) => {
+    console.log('SERVICES - updateTreatmentOrders', {merchant_id, created, updated, deleted, unique_order_pet_id})
+    const result = {}
+
+    console.log('Checking deleted order_pet_service_id is exists')
+    for (const del of deleted) {
+        const order_pet_services = await repository.orders.getOrderPetServicesByID(sql, del)
+        if (!order_pet_services) {
+            return { deletedOrderPetServiceIDNotFound: true, orderPetServiceID: del }
+        }
+
+        if (!unique_order_pet_id.includes(order_pet_services.order_pet_id)) {
+            console.log('unique order_pet_id: ', order_pet_services.order_pet_id)
+            unique_order_pet_id.push(order_pet_services.order_pet_id)
+        }
+    }
+
+    let order_id = 0
+
+    console.log('Checking unique order_pet_id is belong to merchant_id')
+    for (const order_pet_id of unique_order_pet_id) {
+        console.log('order_pet_id: ', order_pet_id)
+        const orders = await repository.orders.getOrdersByOrderPetIDAndMerchantID(sql, order_pet_id, merchant_id)
+        console.log('Orders: ', orders)
+        if (!orders) {
+            return { ordersNotBelongToMerchant: true }
+        }
+        order_id = orders.order_id
+    }
+
+    console.log('Create Order Pet Services')
+    for (const create of created) {
+        console.log('OrderPetService: ', create)
+        const order_pet_services = await repository.orders.createOrderPetService(sql, create.order_pet_id, create.merchant_service_id, create.service_name, create.service_description, create.service_price, create.service_qty, 1)
+
+    }
+
+    console.log('Update Order Pet Services')
+    for (const update of updated) {
+        console.log('OrderPetService: ', update)
+        const id = update.id
+        delete update.id
+        const order_pet_services = await repository.orders.updateOrderPetServices(sql, id, update)
+    }
+
+    console.log('Delete Order Pet Service')
+    for (const del of deleted) {
+        const order_pet_service = await repository.orders.updateOrderPetServices(sql, del, {status: 0})
+
+    }
+
+    console.log('Updating Total Amount Order Pets')
+    for (const order_pet_id of unique_order_pet_id) {
+        const order_pet_services = await repository.orders.getOrderPetServicesByOrderPetID(sql, order_pet_id)
+        const totalAmount = order_pet_services.reduce((acc, curr) => acc += (curr.service_price * curr.service_qty), 0)
+        const update_order_pet_services = await repository.orders.getOrderPetsByID(sql, order_pet_id, {amount: totalAmount})
+    }
+    
+    console.log('Updating Total Amount Orders')
+    const order_pets = await repository.orders.getOrderPetsByOrderID(sql, order_id)
+    const totalAmount = order_pets.reduce((acc, curr) => acc += curr.amount, 0)
+    const update_orders = await repository.orders.updateOrders(sql, order_id, {amount: totalAmount})
+
+    return 1
+}

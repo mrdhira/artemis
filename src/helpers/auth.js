@@ -4,7 +4,7 @@ const privateKey = 'nbznpaSXgj';
 
 exports.generateToken = async (data) => {
     const token = await jwt.sign(data, privateKey, {
-        expiresIn: '24h'
+        // expiresIn: '24h'
     });
 
     return token;

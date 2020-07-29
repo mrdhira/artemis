@@ -15,7 +15,7 @@ exports.getOrderListByCustomerID = (sql, customer_id, status) => {
         return sql
             .query(`
                 SELECT A.id, A.customer_id, A.merchant_id, A.booking_datetime, A.status, A.created_at, A.updated_at
-                , B.full_name AS "merchant_name"
+                , B.full_name AS "merchant_name", B.phone
                 FROM orders AS A
                 JOIN users AS B
                     ON A.merchant_id = B.id
@@ -33,7 +33,7 @@ exports.getOrderListByMerchantID = (sql, merchant_id, status) => {
         return sql
             .query(`
                 SELECT A.id, A.customer_id, A.merchant_id, A.booking_datetime, A.status, A.created_at, A.updated_at
-                , B.full_name
+                , B.full_name, B.phone
                 FROM orders AS A
                 JOIN users AS B
                     ON A.customer_id = B.id

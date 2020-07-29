@@ -129,7 +129,7 @@ exports.giveOrdersRatings = async (req, res) => {
         return helpers.response(res, 422, 'rating is not number', false, {})
     }
 
-    if (!req.body.decoded.merchant_id) {
+    if (req.body.decoded.merchant_id) {
         return helpers.response(res, 403, 'Unauthorized.', false, {})
     }
 

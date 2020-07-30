@@ -51,7 +51,7 @@ exports.getOrderListByMerchantID = (sql, merchant_id, status) => {
 exports.getOrderPetsByOrderID = (sql, order_id) => {
     try {
         return sql
-            .query('SELECT * FROM order_pets WHERE order_id = $1 AND status = 1', [order_id])
+            .query('SELECT * FROM order_pets WHERE order_id = $1 AND status = 1 ORDER BY id ASC', [order_id])
             .then(data => data.rows ? data.rows : [])
     } catch (err) {
         throw err
@@ -61,7 +61,7 @@ exports.getOrderPetsByOrderID = (sql, order_id) => {
 exports.getOrderPetServicesByOrderPetID = (sql, order_pet_id) => {
     try {
         return sql
-            .query('SELECT * FROM order_pet_services WHERE order_pet_id = $1 AND status = 1', [order_pet_id])
+            .query('SELECT * FROM order_pet_services WHERE order_pet_id = $1 AND status = 1 ORDER BY service_name ASC', [order_pet_id])
             .then(data => data.rows ? data.rows : [])
     } catch (err) {
         throw err

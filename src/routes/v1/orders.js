@@ -45,10 +45,24 @@ module.exports = (fastify, options, next) => {
     })
 
     fastify.route({
-        method: 'PUT',
-        url: '/update',
+        method: 'POST',
+        url: '/:orderId/pet/:orderPetId/service',
         preHandler: (req, res, done) => authHelpers.validateToken(req, res, done),
-        handler: (req, res) => controllers.orders.updateTreatmentOrders(req, res),
+        handler: (req, res) => controllers.orders.createOrderPetServices(req, res),
+    })
+
+    fastify.route({
+        method: 'PUT',
+        url: '/:orderId/pet/:orderPetId/service/:orderPetServiceId',
+        preHandler: (req, res, done) => authHelpers.validateToken(req, res, done),
+        handler: (req, res) => controllers.orders.updateOrderPetServices(req, res),
+    })
+
+    fastify.route({
+        method: 'DELETE',
+        url: '/:orderId/pet/:orderPetId/service/:orderPetServiceId',
+        preHandler: (req, res, done) => authHelpers.validateToken(req, res, done),
+        handler: (req, res) => controllers.orders.deleteOrderPetServices(req, res),
     })
 
     next()

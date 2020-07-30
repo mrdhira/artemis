@@ -169,71 +169,158 @@ const ORDER_PET_SERVICE_UPDATED_CHECK_DATA = [
     'service_qty',
 ]
 
-exports.updateTreatmentOrders = async (req, res) => {
+// exports.updateTreatmentOrders = async (req, res) => {
+//     console.log('request body: ', req.body)
+
+//     if (!req.body.decoded.merchant_id) {
+//         return helpers.response(res, 403, 'Unauthorized.', false, {})
+//     }
+
+//     if (
+//         !Array.isArray(req.body.created)
+//         || !Array.isArray(req.body.updated)
+//         || !Array.isArray(req.body.deleted)
+//     ) {
+//         return helpers.response(res, 422, 'created, updated, or deleted is not array.', false, {})
+//     }
+
+//     for (const x of req.body.deleted) {
+//         if (typeof x !== 'number') {
+//             return helpers.response(res, 422, 'deleted have data that is not a number', false, {})
+//         }
+//     }
+
+//     try {
+//         const created = []
+//         const updated = []
+//         const unique_order_pet_id = []
+
+//         console.log('Checking created object')
+//         for (const x of req.body.created) {
+//             console.log('X: ', x)
+//             const obj = {}
+//             for (const y of Object.keys(x)) {
+//                 if (y === 'order_pet_id' && !unique_order_pet_id.includes(y)) {
+//                     console.log('unique order_pet_id: ', y)
+//                     unique_order_pet_id.push(x[y])
+//                 }
+
+//                 if (ORDER_PET_SERVICE_CREATED_CHECK_DATA.includes(y)) {
+//                     obj[y] = x[y]
+//                 }
+//             }
+//             created.push(obj)
+//         }
+
+//         for (const x of req.body.updated) {
+//             console.log('X: ', x)
+//             const obj = {}
+//             for (const y of Object.keys(x)) {
+//                 if (y === 'order_pet_id' && !unique_order_pet_id.includes(y)) {
+//                     console.log('unique order_pet_id: ', y)
+//                     unique_order_pet_id.push(x[y])
+//                 }
+
+//                 if (ORDER_PET_SERVICE_UPDATED_CHECK_DATA.includes(y)) {
+//                     obj[y] = x[y]
+//                 }
+//             }
+//             updated.push(obj)
+//         }
+
+//         const process = await services.orders.updateTreatmentOrders(req.sql, req.body.decoded.merchant_id, created, updated, req.body.deleted, unique_order_pet_id)
+
+//         if (process.deletedOrderPetServiceIDNotFound) {
+//             return helpers.response(res, 404, 'Deleted have not found order_id', false, { order_pet_service_id: process.orderPetServiceID })
+//         } else if (process.ordersNotBelongToMerchant) {
+//             return helpers.response(res, 422, 'The orders is not belong to the merchant.', false, {})
+//         } else {
+//             return helpers.response(res, 200, 'OK', false, {})
+//         }
+//     } catch (err) {
+//         console.error(err)
+//         return helpers.response(res, 500, 'Internal server error.', true, {})
+//     }
+// }
+
+exports.createOrderPetServices = async (req, res) => {
     console.log('request body: ', req.body)
+    console.log('request params: ', req.params)
+    const { orderId, orderPetId } = req.params
+    const { order_pet_id, merchant_service_id, service_name, service_description, service_price, service_qty } = req.body
 
     if (!req.body.decoded.merchant_id) {
         return helpers.response(res, 403, 'Unauthorized.', false, {})
     }
 
-    if (
-        !Array.isArray(req.body.created)
-        || !Array.isArray(req.body.updated)
-        || !Array.isArray(req.body.deleted)
-    ) {
-        return helpers.response(res, 422, 'created, updated, or deleted is not array.', false, {})
-    }
-
-    for (const x of req.body.deleted) {
-        if (typeof x !== 'number') {
-            return helpers.response(res, 422, 'deleted have data that is not a number', false, {})
+    try {
+        const processCreated = await services.orders.createOrderPetServices(
+            req.sql, req.body.decoded.merchant_id, orderId, orderPetId, 
+            {
+                order_pet_id,
+                merchant_service_id,
+                service_name,
+                service_description,
+                service_price,
+                service_qty
+            }
+        )
+        if (processCreated.ordersNotBelongToMerchant) {
+            return helpers.response(res, 422, 'orders is not belong to the merchant.', false, {})
+        } else if (processCreated.ordersPetsNotFound) {
+            return helpers.response(res, 404, 'ordersPets not found.', false, {})
+        } else {
+            return helpers.response(res, 200, 'OK', false, {})
         }
+    } catch (err) {
+        console.error(err)
+        return helpers.response(res, 500, 'Internal server error.', true, {})
+    }
+}
+
+exports.updateOrderPetServices = async (req, res) => {
+    console.log('request body: ', req.body)
+    console.log('request params: ', req.params)
+    const { orderId, orderPetId, orderPetServiceId } = req.params
+    const { qty } = req.body
+
+    if (!req.body.decoded.merchant_id) {
+        return helpers.response(res, 403, 'Unauthorized.', false, {})
     }
 
     try {
-        const created = []
-        const updated = []
-        const unique_order_pet_id = []
-
-        console.log('Checking created object')
-        for (const x of req.body.created) {
-            console.log('X: ', x)
-            const obj = {}
-            for (const y of Object.keys(x)) {
-                if (y === 'order_pet_id' && !unique_order_pet_id.includes(y)) {
-                    console.log('unique order_pet_id: ', y)
-                    unique_order_pet_id.push(x[y])
-                }
-
-                if (ORDER_PET_SERVICE_CREATED_CHECK_DATA.includes(y)) {
-                    obj[y] = x[y]
-                }
-            }
-            created.push(obj)
+        const processUpdate = await services.orders.updateOrderPetServices(req.sql, req.body.decoded.merchant_id, orderId, orderPetId, orderPetServiceId, qty)
+        if (processUpdate.ordersNotBelongToMerchant) {
+            return helpers.response(res, 422, 'orders is not belong to the merchant.', false, {})
+        } else if (processUpdate.ordersPetsNotFound) {
+            return helpers.response(res, 404, 'ordersPets not found.', false, {})
+        } else if (processUpdate.orderPetServicesNotFound) {
+            return helpers.response(res, 404, 'ordersPetService not found.', false, {})
+        } else {
+            return helpers.response(res, 200, 'OK', false, {})
         }
+    } catch (err) {
+        console.error(err)
+        return helpers.response(res, 500, 'Internal server error.', true, {})
+    }
+}
 
-        for (const x of req.body.updated) {
-            console.log('X: ', x)
-            const obj = {}
-            for (const y of Object.keys(x)) {
-                if (y === 'order_pet_id' && !unique_order_pet_id.includes(y)) {
-                    console.log('unique order_pet_id: ', y)
-                    unique_order_pet_id.push(x[y])
-                }
+exports.deleteOrderPetServices = async (req, res) => {
+    console.log('request params: ', req.params)
+    const { orderId, orderPetId, orderPetServiceId } = req.params
 
-                if (ORDER_PET_SERVICE_UPDATED_CHECK_DATA.includes(y)) {
-                    obj[y] = x[y]
-                }
-            }
-            updated.push(obj)
-        }
+    if (!req.body.decoded.merchant_id) {
+        return helpers.response(res, 403, 'Unauthorized.', false, {})
+    }
 
-        const process = await services.orders.updateTreatmentOrders(req.sql, req.body.decoded.merchant_id, created, updated, req.body.deleted, unique_order_pet_id)
-
-        if (process.deletedOrderPetServiceIDNotFound) {
-            return helpers.response(res, 404, 'Deleted have not found order_id', false, { order_pet_service_id: process.orderPetServiceID })
-        } else if (process.ordersNotBelongToMerchant) {
-            return helpers.response(res, 422, 'The orders is not belong to the merchant.', false, {})
+    try {
+        const processDeleted = await services.orders.deleteOrderPetServices(req.sql, req.body.decoded.merchant_id, orderId, orderPetId, orderPetServiceId)
+        if (processDeleted.ordersNotBelongToMerchant) {
+            return helpers.response(res, 422, 'orders is not belong to the merchant.', false, {})
+        } else if (processDeleted.ordersPetsNotFound) {
+            return helpers.response(res, 404, 'ordersPets not found.', false, {})
+        } else if (processDeleted.orderPetServicesNotFound) {
+            return helpers.response(res, 404, 'ordersPetService not found.', false, {})
         } else {
             return helpers.response(res, 200, 'OK', false, {})
         }

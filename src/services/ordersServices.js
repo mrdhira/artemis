@@ -190,68 +190,191 @@ exports.giveOrdersRatings = async (sql, order_id, rating, description) => {
     }
 }
 
-exports.updateTreatmentOrders = async (sql, merchant_id, created, updated, deleted, unique_order_pet_id) => {
-    console.log('SERVICES - updateTreatmentOrders', {merchant_id, created, updated, deleted, unique_order_pet_id})
-    const result = {}
+// exports.updateTreatmentOrders = async (sql, merchant_id, created, updated, deleted, unique_order_pet_id) => {
+//     console.log('SERVICES - updateTreatmentOrders', {merchant_id, created, updated, deleted, unique_order_pet_id})
+//     const result = {}
 
-    console.log('Checking deleted order_pet_service_id is exists')
-    for (const del of deleted) {
-        const order_pet_services = await repository.orders.getOrderPetServicesByID(sql, del)
-        if (!order_pet_services) {
-            return { deletedOrderPetServiceIDNotFound: true, orderPetServiceID: del }
-        }
+//     console.log('Checking deleted order_pet_service_id is exists')
+//     for (const del of deleted) {
+//         const order_pet_services = await repository.orders.getOrderPetServicesByID(sql, del)
+//         if (!order_pet_services) {
+//             return { deletedOrderPetServiceIDNotFound: true, orderPetServiceID: del }
+//         }
 
-        if (!unique_order_pet_id.includes(order_pet_services.order_pet_id)) {
-            console.log('unique order_pet_id: ', order_pet_services.order_pet_id)
-            unique_order_pet_id.push(order_pet_services.order_pet_id)
-        }
-    }
+//         if (!unique_order_pet_id.includes(order_pet_services.order_pet_id)) {
+//             console.log('unique order_pet_id: ', order_pet_services.order_pet_id)
+//             unique_order_pet_id.push(order_pet_services.order_pet_id)
+//         }
+//     }
 
-    let order_id = 0
+//     let order_id = 0
 
-    console.log('Checking unique order_pet_id is belong to merchant_id')
-    for (const order_pet_id of unique_order_pet_id) {
-        console.log('order_pet_id: ', order_pet_id)
-        const orders = await repository.orders.getOrdersByOrderPetIDAndMerchantID(sql, order_pet_id, merchant_id)
-        console.log('Orders: ', orders)
-        if (!orders) {
-            return { ordersNotBelongToMerchant: true }
-        }
-        order_id = orders.order_id
-    }
+//     console.log('Checking unique order_pet_id is belong to merchant_id')
+//     for (const order_pet_id of unique_order_pet_id) {
+//         console.log('order_pet_id: ', order_pet_id)
+//         const orders = await repository.orders.getOrdersByOrderPetIDAndMerchantID(sql, order_pet_id, merchant_id)
+//         console.log('Orders: ', orders)
+//         if (!orders) {
+//             return { ordersNotBelongToMerchant: true }
+//         }
+//         order_id = orders.order_id
+//     }
 
-    console.log('Create Order Pet Services')
-    for (const create of created) {
-        console.log('OrderPetService: ', create)
-        const order_pet_services = await repository.orders.createOrderPetService(sql, create.order_pet_id, create.merchant_service_id, create.service_name, create.service_description, create.service_price, create.service_qty, 1)
+//     console.log('Create Order Pet Services')
+//     for (const create of created) {
+//         console.log('OrderPetService: ', create)
+//         const order_pet_services = await repository.orders.createOrderPetService(sql, create.order_pet_id, create.merchant_service_id, create.service_name, create.service_description, create.service_price, create.service_qty, 1)
 
-    }
+//     }
 
-    console.log('Update Order Pet Services')
-    for (const update of updated) {
-        console.log('OrderPetService: ', update)
-        const id = update.id
-        delete update.id
-        const order_pet_services = await repository.orders.updateOrderPetServices(sql, id, update)
-    }
+//     console.log('Update Order Pet Services')
+//     for (const update of updated) {
+//         console.log('OrderPetService: ', update)
+//         const id = update.id
+//         delete update.id
+//         const order_pet_services = await repository.orders.updateOrderPetServices(sql, id, update)
+//     }
 
-    console.log('Delete Order Pet Service')
-    for (const del of deleted) {
-        const order_pet_service = await repository.orders.updateOrderPetServices(sql, del, {status: 0})
+//     console.log('Delete Order Pet Service')
+//     for (const del of deleted) {
+//         const order_pet_service = await repository.orders.updateOrderPetServices(sql, del, {status: 0})
 
-    }
+//     }
 
-    console.log('Updating Total Amount Order Pets')
-    for (const order_pet_id of unique_order_pet_id) {
-        const order_pet_services = await repository.orders.getOrderPetServicesByOrderPetID(sql, order_pet_id)
-        const totalAmount = order_pet_services.reduce((acc, curr) => acc += (curr.service_price * curr.service_qty), 0)
-        const update_order_pet_services = await repository.orders.getOrderPetsByID(sql, order_pet_id, {amount: totalAmount})
-    }
+//     console.log('Updating Total Amount Order Pets')
+//     for (const order_pet_id of unique_order_pet_id) {
+//         const order_pet_services = await repository.orders.getOrderPetServicesByOrderPetID(sql, order_pet_id)
+//         const totalAmount = order_pet_services.reduce((acc, curr) => acc += (curr.service_price * curr.service_qty), 0)
+//         const update_order_pet_services = await repository.orders.updateOrderPets(sql, order_pet_id, {amount: totalAmount})
+//     }
     
-    console.log('Updating Total Amount Orders')
-    const order_pets = await repository.orders.getOrderPetsByOrderID(sql, order_id)
-    const totalAmount = order_pets.reduce((acc, curr) => acc += curr.amount, 0)
-    const update_orders = await repository.orders.updateOrders(sql, order_id, {amount: totalAmount})
+//     console.log('Updating Total Amount Orders')
+//     const order_pets = await repository.orders.getOrderPetsByOrderID(sql, order_id)
+//     const totalAmount = order_pets.reduce((acc, curr) => acc += curr.amount, 0)
+//     const update_orders = await repository.orders.updateOrders(sql, order_id, {amount: totalAmount})
+
+//     return 1
+// }
+
+/**
+ * 
+ */
+exports.createOrderPetServices = async (sql, merchant_id, orderId, orderPetId, data) => {
+    console.log('SERVICES - createOrderPetServices', { merchant_id, orderId, orderPetId, data })
+
+    console.log('Checking if Order Belong to Merchant')
+    const checkOrders = await repository.orders.getOrdersByOrderPetIDAndMerchantID(sql, orderPetId, merchant_id)
+    if (!checkOrders) {
+        return { ordersNotBelongToMerchant: true }
+    }
+
+    console.log('Checking if order_pets exists')
+    const checkOrderPets = await repository.orders.getOrderPetsByID(sql, orderPetId)
+    if (!checkOrderPets) {
+        return { ordersPetsNotFound: true }
+    }
+
+    console.log('Creating order_pet_services')
+    await repository.orders.createOrderPetService(
+        sql,
+        data.order_pet_id,
+        data.merchant_service_id,
+        data.service_name,
+        data.service_description,
+        data.service_price,
+        data.service_qty,
+        1
+    )
+
+    console.log('Recalculating order_pets')
+    const allOrderPetServices = await repository.orders.getOrderPetServicesByOrderPetID(sql, orderPetId)
+    const orderPetsTotalAmount = allOrderPetServices.reduce((acc, curr) => acc += (curr.service_price * curr.service_qty), 0)
+    await repository.orders.updateOrderPets(sql, orderPetId, { amount: orderPetsTotalAmount })
+
+    console.log('Recalculating orders')
+    const allOrderPets = await repository.orders.getOrderPetsByOrderID(sql, orderId)
+    const ordersTotalAmount = allOrderPets.reduce((acc, curr) => acc += curr.amount, 0)
+    await repository.orders.updateOrders(sql, orderId, { amount: ordersTotalAmount })
+
+    return 1
+}
+
+/**
+ * 
+ */
+exports.updateOrderPetServices = async (sql, merchant_id, orderId, orderPetId, orderPetServiceId, qty) => {
+    console.log('SERVICES - updateOrderPetServices', { merchant_id, orderId, orderPetId, orderPetServiceId, qty })
+
+    console.log('Checking if Order Belong to Merchant')
+    const checkOrders = await repository.orders.getOrdersByOrderPetIDAndMerchantID(sql, orderPetId, merchant_id)
+    if (!checkOrders) {
+        return { ordersNotBelongToMerchant: true }
+    }
+
+    console.log('Checking if order_pets exists')
+    const checkOrderPets = await repository.orders.getOrderPetsByID(sql, orderPetId)
+    if (!checkOrderPets) {
+        return { ordersPetsNotFound: true }
+    }
+
+    console.log('Checking if order_pet_services exists')
+    const checkOrderPetServices = await repository.orders.getOrderPetServicesByID(sql, orderPetServiceId)
+    if (!checkOrderPetServices) {
+        return { orderPetServicesNotFound: true }
+    }
+
+    console.log('Updating order_pet_services')
+    await repository.orders.updateOrderPetServices(sql, orderPetServiceId, { service_qty: qty })
+
+    console.log('Recalculating order_pets')
+    const allOrderPetServices = await repository.orders.getOrderPetServicesByOrderPetID(sql, orderPetId)
+    const orderPetsTotalAmount = allOrderPetServices.reduce((acc, curr) => acc += (curr.service_price * curr.service_qty), 0)
+    await repository.orders.updateOrderPets(sql, orderPetId, { amount: orderPetsTotalAmount })
+
+    console.log('Recalculating orders')
+    const allOrderPets = await repository.orders.getOrderPetsByOrderID(sql, orderId)
+    const ordersTotalAmount = allOrderPets.reduce((acc, curr) => acc += curr.amount, 0)
+    await repository.orders.updateOrders(sql, orderId, { amount: ordersTotalAmount })
+
+    return 1
+}
+
+/**
+ * 
+ */
+exports.deleteOrderPetServices = async (sql, merchant_id, orderId, orderPetId, orderPetServiceId) => {
+    console.log('SERVICES - deleteOrderPetServices', { merchant_id, orderId, orderPetId, orderPetServiceId })
+
+    console.log('Checking if Order Belong to Merchant')
+    const checkOrders = await repository.orders.getOrdersByOrderPetIDAndMerchantID(sql, orderPetId, merchant_id)
+    if (!checkOrders) {
+        return { ordersNotBelongToMerchant: true }
+    }
+
+    console.log('Checking if order_pets exists')
+    const checkOrderPets = await repository.orders.getOrderPetsByID(sql, orderPetId)
+    if (!checkOrderPets) {
+        return { ordersPetsNotFound: true }
+    }
+
+    console.log('Checking if order_pet_services exists')
+    const checkOrderPetServices = await repository.orders.getOrderPetServicesByID(sql, orderPetServiceId)
+    if (!checkOrderPetServices) {
+        return { orderPetServicesNotFound: true }
+    }
+
+    console.log('Deleting order_pet_services')
+    await repository.orders.updateOrderPetServices(sql, orderPetServiceId, { status: 0 })
+
+    console.log('Recalculating order_pets')
+    const allOrderPetServices = await repository.orders.getOrderPetServicesByOrderPetID(sql, orderPetId)
+    const orderPetsTotalAmount = allOrderPetServices.reduce((acc, curr) => acc += (curr.service_price * curr.service_qty), 0)
+    await repository.orders.updateOrderPets(sql, orderPetId, { amount: orderPetsTotalAmount })
+
+    console.log('Recalculating orders')
+    const allOrderPets = await repository.orders.getOrderPetsByOrderID(sql, orderId)
+    const ordersTotalAmount = allOrderPets.reduce((acc, curr) => acc += curr.amount, 0)
+    await repository.orders.updateOrders(sql, orderId, { amount: ordersTotalAmount })
 
     return 1
 }

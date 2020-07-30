@@ -186,18 +186,6 @@ exports.updateOrderPetServices = (sql, id, data) => {
     }
 }
 
-exports.recalculateOrderPetAmountByOrderID = (sql, order_id) => {
-    try {
-        return sql
-            .query(`
-                SELECT DISTINCT
-
-            `)
-    } catch (err) {
-        throw err
-    }
-}
-
 exports.getOrderPetsByID = (sql, id) => {
     try {
         return sql

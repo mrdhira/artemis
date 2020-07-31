@@ -12,7 +12,7 @@ exports.getNewsList = async (req, res) => {
     try {
         const newsList = await services.news.getNewsList(req.sql)
         return helpers.response(res, 200, 'OK', false, newsList)
-    } catch (error) {
+    } catch (err) {
         console.error(err)
         return helpers.response(res, 500, 'Internal server error.', true, {})
     }
@@ -35,7 +35,7 @@ exports.getNewsDetail = async (req, res) => {
         } else {
             return helpers.response(res, 200, 'OK', false, news)
         }
-    } catch (error) {
+    } catch (err) {
         console.error(err)
         return helpers.response(res, 500, 'Internal server error.', true, {})        
     }

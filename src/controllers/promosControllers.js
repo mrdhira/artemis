@@ -12,7 +12,7 @@ exports.getPromosList = async (req, res) => {
     try {
         const promosList = await services.promos.getPromosList(req.sql)
         return helpers.response(res, 200, 'OK', false, promosList)
-    } catch (error) {
+    } catch (err) {
         console.error(err)
         return helpers.response(res, 500, 'Internal server error.', true, {})
     }
@@ -35,7 +35,7 @@ exports.getPromosDetail = async (req, res) => {
         } else {
             return helpers.response(res, 200, 'OK', false, promos)
         }
-    } catch (error) {
+    } catch (err) {
         console.error(err)
         return helpers.response(res, 500, 'Internal server error.', true, {})        
     }

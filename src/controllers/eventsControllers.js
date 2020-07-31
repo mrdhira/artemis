@@ -12,7 +12,7 @@ exports.getEventsList = async (req, res) => {
     try {
         const eventsList = await services.events.getEventsList(req.sql)
         return helpers.response(res, 200, 'OK', false, eventsList)
-    } catch (error) {
+    } catch (err) {
         console.error(err)
         return helpers.response(res, 500, 'Internal server error.', true, {})
     }
@@ -35,7 +35,7 @@ exports.getEventsDetail = async (req, res) => {
         } else {
             return helpers.response(res, 200, 'OK', false, events)
         }
-    } catch (error) {
+    } catch (err) {
         console.error(err)
         return helpers.response(res, 500, 'Internal server error.', true, {})        
     }

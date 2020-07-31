@@ -6,15 +6,15 @@ const helpers = require('../helpers')
  * @param {*} req
  * @param {*} res
  */
-exports.getEventList = async (sql) => {
+exports.getEventsList = async (sql) => {
     const result = []
-    const eventsList = await repository.events.geteventsList(sql)
+    const eventsList = await repository.events.getEventsList(sql)
     for (const events of eventsList) {
         events.file = null
         if (events.picture_id && events.url) {
             events.file = await helpers.readFile(events.url)
         }
-        result.shift(events)
+        result.unshift(events)
     }
     return result
 }
@@ -24,8 +24,8 @@ exports.getEventList = async (sql) => {
  * @param {*} req 
  * @param {*} res 
  */
-exports.getEventDetail = async (sql, id) => {
-    const events = await repository.events.geteventsDetail(sql, id)
+exports.getEventsDetail = async (sql, id) => {
+    const events = await repository.events.getEventsDetail(sql, id)
     events.file = null
     if (events.picture_id && events.url) {
         events.file = await helpers.readFile(events.url)

@@ -14,8 +14,9 @@ exports.getNewsList = async (sql) => {
         if (news.picture_id && news.url) {
             news.file = await helpers.readFile(news.url)
         }
-        result.shift(news)
+        result.unshift(news)
     }
+    console.log('Result: ', result)
     return result
 }
 

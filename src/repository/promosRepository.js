@@ -3,7 +3,7 @@ exports.getPromosList = (sql) => {
         return sql
             .query(`
                 SELECT A.*
-                    , C.url
+                    , B.url
                 FROM promos AS A
                 JOIN pictures AS B
                     ON A.picture_id = B.id
@@ -20,7 +20,7 @@ exports.getPromosDetail = (sql, id) => {
         return sql
             .query(`
                 SELECT A.*
-                    , C.url
+                    , B.url
                 FROM promos AS A
                 JOIN pictures AS B
                     ON A.picture_id = B.id

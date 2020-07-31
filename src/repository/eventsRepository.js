@@ -3,7 +3,7 @@ exports.getEventsList = (sql) => {
         return sql
             .query(`
                 SELECT A.*
-                    , C.url
+                    , B.url
                 FROM events AS A
                 JOIN pictures AS B
                     ON A.picture_id = B.id
@@ -20,7 +20,7 @@ exports.getEventsDetail = (sql, id) => {
         return sql
             .query(`
                 SELECT A.*
-                    , C.url
+                    , B.url
                 FROM events AS A
                 JOIN pictures AS B
                     ON A.picture_id = B.id

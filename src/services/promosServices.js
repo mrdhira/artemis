@@ -6,7 +6,16 @@ const repository = require('../repository');
  * @param {*} res
  */
 exports.getPromosList = async (sql) => {
-    return 1
+    const result = []
+    const promosList = await repository.promos.getPromosList(sql)
+    for (const promos of promosList) {
+        promos.file = null
+        if (promos.picture_id && promos.url) {
+            promos.file = await helpers.readFile(promos.url)
+        }
+        result.shift(promos)
+    }
+    return result
 }
 
 /**
@@ -15,5 +24,11 @@ exports.getPromosList = async (sql) => {
  * @param {*} res 
  */
 exports.getPromosDetail = async (sql) => {
-    return 1
+    const promos = await repository.promos.getPromosDetail(sql, id)
+    promos.file = null
+    if (promos.picture_id && promos.url) {
+        promos.file = await helpers.readFile(promos.url)
+    }
+    
+    return promos
 }

@@ -9,7 +9,13 @@ const helpers = require('../helpers')
 exports.getNewsList = async (req, res) => {
     console.log('request body: ', req.body);
 
-    return helpers.response(res, 200, 'OK', false, {})
+    try {
+        const newsList = await services.news.getNewsList(req.sql)
+        return helpers.response(res, 200, 'OK', false, newsList)
+    } catch (error) {
+        console.error(err)
+        return helpers.response(res, 500, 'Internal server error.', true, {})
+    }
 }
 
 /**
@@ -18,7 +24,19 @@ exports.getNewsList = async (req, res) => {
  * @param {*} res 
  */
 exports.getNewsDetail = async (req, res) => {
-    console.log('request body: ', req.body);
+    console.log('request params: ', req.params);
+    const { id } = req.params
 
-    return helpers.response(res, 200, 'OK', false, {})
+    try {
+        const news = await services.news.getNewsDetail(req.sql, id)
+
+        if (!news) {
+            return helpers.response(res, 404, 'News not found.', false, {})
+        } else {
+            return helpers.response(res, 200, 'OK', false, news)
+        }
+    } catch (error) {
+        console.error(err)
+        return helpers.response(res, 500, 'Internal server error.', true, {})        
+    }
 }

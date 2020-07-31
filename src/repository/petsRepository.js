@@ -84,3 +84,28 @@ exports.deletePets = (sql, id) => {
         throw err
     }
 }
+
+exports.getMedicalRecordsByPetID = (sql, pet_id) => {
+    try {
+        return sql
+            .query(`
+                SELECT C.service_name, E.full_name AS "merchant_name", B.booking_datetime
+                FROM order_pets AS A
+                JOIN orders AS B
+                    ON A.order_id = B."id"
+                    AND B.status = 5
+                JOIN order_pet_services AS C
+                    ON A.id = C.order_pet_id
+                    AND C.status = 1
+                JOIN user_merchants AS D
+                    ON B.merchant_id = D."id"
+                JOIN users AS E
+                    ON D.user_id = E.id
+                WHERE A.pet_id = $1 AND A.status = 1
+                ORDER BY B.booking_datetime ASC, C.service_name ASC            
+            `, [pet_id])
+            .then(data => data.rows ? data.rows : [])
+    } catch (err) {
+        throw err
+    }
+}

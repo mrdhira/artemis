@@ -40,7 +40,9 @@ exports.getPetsDetail = async (sql, id) => {
             pictures.file = await helpers.readFile(pictures.url)
         }
     }
-    return { pets, pictures }
+    const medicalRecords = await repository.pets.getMedicalRecordsByPetID(sql, id)
+
+    return { pets, pictures, medical_records: medicalRecords }
 }
 
 /**

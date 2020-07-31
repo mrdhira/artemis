@@ -5,13 +5,25 @@ exports.getAllMerchants = (sql) => {
         return sql
             .query(`
                 SELECT A.id, A.picture_id, A.full_name, A.email, A.phone
-                , B.id AS "merchant_id", B.address, B.operational_hour, B.facility, B.latitude, B.longtitude
-                , C.url
+                    , B.id AS "merchant_id", B.address, B.operational_hour, B.facility, B.latitude, B.longtitude
+                    , C.url
+                    , D.ratings, D.total_ratings
                 FROM users AS A
                 JOIN user_merchants AS B
-                ON A.id = B.user_id
+                    ON A.id = B.user_id
                 LEFT JOIN pictures AS C
-                ON A.picture_id = C.id`)
+                    ON A.picture_id = C.id
+                LEFT JOIN (
+                    SELECT A.merchant_id
+                        , COUNT(B.id) AS "total_ratings"
+                        , SUM(B.rating) / COUNT(B.id) AS "ratings"
+                    FROM orders AS A
+                    JOIN order_reviews AS B
+                        ON A.id = B.order_id
+                    GROUP BY A.merchant_id
+                ) AS D
+                    ON B.id = D.merchant_id
+                `)
             .then(data => data.rows ? data.rows : [])
     } catch (err) {
         throw err;
@@ -45,6 +57,25 @@ exports.getMerchantsByID = (sql, id) => {
             .then(data => data.rows ? data.rows[0] : null)
     } catch (err) {
         throw err;
+    }
+}
+
+exports.getMerchantRatingsByMerchantID = (sql, merchant_id) => {
+    try {
+        return sql
+            .query(`
+                SELECT A.merchant_id
+                    , COUNT(B.id) AS "total_ratings"
+                    , SUM(B.rating) / COUNT(B.id) AS "ratings"
+                FROM orders AS A
+                JOIN order_reviews AS B
+                    ON A.id = B.order_id
+                WHERE A.merchant_id = $1
+                GROUP BY A.merchant_id
+            `, [merchant_id])
+            .then(data => data.rows ? data.rows : { merchant_id, total_ratings: 0, ratings: 0} )
+    } catch (err) {
+        throw err
     }
 }
 

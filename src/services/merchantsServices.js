@@ -40,5 +40,7 @@ exports.getMerchantsDetail = async (sql, id) => {
             pictures.file = await helpers.readFile(pictures.url)
         }
     }
-    return { user, merchant, merchantServices, pictures }
+    const merchantRatings = await repository.merchants.getMerchantRatingsByMerchantID(sql, id)
+
+    return { user, merchant, merchantServices, pictures, merchantRatings }
 }

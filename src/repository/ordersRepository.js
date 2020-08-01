@@ -4,7 +4,10 @@ exports.getOrdersByID = (sql, id) => {
     try {
         return sql
             .query('SELECT * FROM orders WHERE id = $1', [id])
-            .then(data => data.rows ? data.rows[0] : null)
+            .then(data => {
+                console.timeEnd('QueryTimeExec')
+                return data.rows ? data.rows[0] : null
+            })
     } catch (err) {
         throw err
     }
@@ -24,7 +27,10 @@ exports.getOrderListByCustomerID = (sql, customer_id, status) => {
                 WHERE A.customer_id = $1 AND status IN(${status})
                 `,
             [customer_id])
-            .then(data => data.rows ? data.rows : [])
+            .then(data => {
+                console.timeEnd('QueryTimeExec')
+                return data.rows ? data.rows : []
+            })
     } catch (err) {
         throw err;
     }
@@ -42,7 +48,10 @@ exports.getOrderListByMerchantID = (sql, merchant_id, status) => {
                 WHERE A.merchant_id = $1 AND status IN(${status})
                 `,
             [merchant_id])
-            .then(data => data.rows ? data.rows : [])
+            .then(data => {
+                console.timeEnd('QueryTimeExec')
+                return data.rows ? data.rows : []
+            })
     } catch (err) {
         throw err;
     }
@@ -52,7 +61,10 @@ exports.getOrderPetsByOrderID = (sql, order_id) => {
     try {
         return sql
             .query('SELECT * FROM order_pets WHERE order_id = $1 AND status = 1 ORDER BY id ASC', [order_id])
-            .then(data => data.rows ? data.rows : [])
+            .then(data => {
+                console.timeEnd('QueryTimeExec')
+                return data.rows ? data.rows : []
+            })
     } catch (err) {
         throw err
     }
@@ -62,7 +74,10 @@ exports.getOrderPetServicesByOrderPetID = (sql, order_pet_id) => {
     try {
         return sql
             .query('SELECT * FROM order_pet_services WHERE order_pet_id = $1 AND status = 1 ORDER BY service_name ASC', [order_pet_id])
-            .then(data => data.rows ? data.rows : [])
+            .then(data => {
+                console.timeEnd('QueryTimeExec')
+                return data.rows ? data.rows : []
+            })
     } catch (err) {
         throw err
     }
@@ -77,7 +92,10 @@ exports.createOrders = async (sql, customer_id, merchant_id, booking_datetime, a
                         {customer_id, merchant_id, booking_datetime, amount, status}, 'orders'),
                         [customer_id, merchant_id, booking_datetime, amount, status]
             )
-            .then(data => data.rows[0])
+            .then(data => {
+                console.timeEnd('QueryTimeExec')
+                return data.rows[0]
+            })
     } catch (err) {
         throw err
     }
@@ -92,7 +110,10 @@ exports.createOrderPet = async (sql, order_id, pet_id, amount, status) => {
                     {order_id, pet_id, amount, status}, 'order_pets'),
                     [order_id, pet_id, amount, status]
         )
-        .then(data => data.rows[0])
+        .then(data => {
+            console.timeEnd('QueryTimeExec')
+            return data.rows[0]
+        })
     } catch (err) {
         throw err
     }
@@ -107,16 +128,21 @@ exports.createOrderPetService = async (sql, order_pet_id, merchant_service_id, s
                     {order_pet_id, merchant_service_id, service_name, service_description, service_price, service_qty, status}, 'order_pet_services'),
                     [order_pet_id, merchant_service_id, service_name, service_description, service_price, service_qty, status]
         )
-        .then(data => data.rows[0])
+        .then(data => {
+            console.timeEnd('QueryTimeExec')
+            return data.rows[0]
+        })
     } catch (err) {
         throw err
     }
 }
 
-exports.updateStatusOrders = (sql, id, status) => {
+exports.updateStatusOrders = async (sql, id, status) => {
     try {
-        return sql
+        await sql
             .query(queryHelpers.updateQuery({status}, 'orders', {id}), [status])
+        console.timeEnd('QueryTimeExec')
+        return 1
     } catch (err) {
         throw err
     }
@@ -131,7 +157,10 @@ exports.insertOrderReviews = (sql, order_id, rating, description) => {
                         {order_id, rating, description}, 'order_reviews'),
                         [order_id, rating, description]
             )
-            .then(data => data.rows[0])
+            .then(data => {
+                console.timeEnd('QueryTimeExec')
+                return data.rows[0]
+            })
     } catch (err) {
         throw err
     }
@@ -141,7 +170,10 @@ exports.getOrderReviewsByOrderID = (sql, order_id) => {
     try {
         return sql
             .query('SELECT * FROM order_reviews WHERE order_id = $1', [order_id])
-            .then(data => data.rows && data.rows.length != 0 ? data.rows : null)
+            .then(data => {
+                console.timeEnd('QueryTimeExec')
+                return data.rows && data.rows.length != 0 ? data.rows : null
+            })
     } catch (err) {
         throw err
     }
@@ -151,7 +183,10 @@ exports.getOrderPetServicesByID = (sql, id) => {
     try {
         return sql
             .query('SELECT * FROM order_pet_services WHERE id = $1 LIMIT 1', [id])
-            .then(data => data.rows && data.rows.length != 0 ? data.rows[0] : null)
+            .then(data => {
+                console.timeEnd('QueryTimeExec')
+                return data.rows && data.rows.length != 0 ? data.rows[0] : null
+            })
     } catch (err) {
         throw err
     }
@@ -168,7 +203,10 @@ exports.getOrdersByOrderPetIDAndMerchantID = (sql, order_pet_id, merchant_id) =>
                     ON A.id = B.order_id
                 WHERE A.merchant_id = $1 AND B.id = $2
             `, [merchant_id, order_pet_id])
-            .then(data => data.rows && data.rows.length != 0 ? data.rows[0] : null)
+            .then(data => {
+                console.timeEnd('QueryTimeExec')
+                return data.rows && data.rows.length != 0 ? data.rows[0] : null
+            })
     } catch (err) {
         throw err
     }
@@ -179,6 +217,7 @@ exports.updateOrderPetServices = (sql, id, data) => {
         return sql
             .query(queryHelpers.updateQuery(data, 'order_pet_services', {id}), Object.values(data))
             .then(() => {
+                console.timeEnd('QueryTimeExec')
                 return this.getOrderPetServicesByID(sql, id)
             })
     } catch (err) {
@@ -190,7 +229,10 @@ exports.getOrderPetsByID = (sql, id) => {
     try {
         return sql
             .query('SELECT * FROM order_pets WHERE id = $1 LIMIT 1', [id])
-            .then(data => data.rows && data.rows.length != 0 ? data.rows[0] : null)
+            .then(data => {
+                console.timeEnd('QueryTimeExec')
+                return data.rows && data.rows.length != 0 ? data.rows[0] : null
+            })
     } catch (err) {
         throw err
     }
@@ -201,6 +243,7 @@ exports.updateOrderPets = (sql, id, data) => {
         return sql
             .query(queryHelpers.updateQuery(data, 'order_pets', {id}), Object.values(data))
             .then(() => {
+                console.timeEnd('QueryTimeExec')
                 return this.getOrderPetsByID(sql, id)
             })
     } catch (err) {
@@ -213,6 +256,7 @@ exports.updateOrders = (sql, id, data) => {
         return sql
             .query(queryHelpers.updateQuery(data, 'orders', {id}), Object.values(data))
             .then(() => {
+                console.timeEnd('QueryTimeExec')
                 return this.getOrdersByID(sql, id)
             })
     } catch (err) {

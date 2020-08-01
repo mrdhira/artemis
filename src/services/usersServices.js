@@ -9,7 +9,7 @@ const repository = require('../repository');
  * @param {*} password
  * @param {*} type
  */
-exports.register = async (sql, full_name, email, phone, password, type) => {
+exports.register = async (sql, full_name, email, phone, password, type, device_token) => {
     const data = {}
     try {
         const checkEmail = await repository.users.getUserByEmail(sql, email)
@@ -25,6 +25,8 @@ exports.register = async (sql, full_name, email, phone, password, type) => {
                 data.merchants = await repository.merchants.createMerchants(sql, data.user.id)
                 console.log('MerchantCreated: ', data.merchants)
             }
+
+            data.user_tokens = await repository.users.insertUserToken(sql, data.user.id, device_token, 1)
             
             return data
         }
@@ -39,7 +41,7 @@ exports.register = async (sql, full_name, email, phone, password, type) => {
  * @param {*} password 
  * @param {*} type
  */
-exports.login = async (sql, email, password, type) => {
+exports.login = async (sql, email, password, type, device_token) => {
     const data = {};
     try {
         data.user = await repository.users.getUserByEmail(sql, email);
@@ -53,12 +55,38 @@ exports.login = async (sql, email, password, type) => {
                         return { merchantsNotFound: true }
                     }
                 }
+
+                const checkToken = await repository.users.getUserTokenByUserIDAndToken(sql, data.user.id, device_token)
+                if (checkToken && checkToken.status == 0) {
+                    // Update token to active
+                    await repository.users.updateUserToken(sql, checkToken.id, 1)
+                } else if (!checkToken) {
+                    await repository.users.insertUserToken(sql, data.user.id, device_token, 1)
+                }
                 return data
+            } else {
+                return { invalidPassword: true }
             }
-            return { invalidPassword: true }
         } else {
             return false;
         }
+    } catch (err) {
+        throw err
+    }
+}
+
+/**
+ * 
+ * @param {*} id
+ * @param {*} device_token 
+ */
+exports.logout = async (sql, user_id, device_token) => {
+    try {
+        const user_tokens = await repository.users.getUserTokenByUserIDAndToken(sql, user_id, token)
+        if (user_tokens) {
+            await repository.users.updateUserToken(sql, user_tokens.id, 0)
+        }
+        return 1
     } catch (err) {
         throw err
     }

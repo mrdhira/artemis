@@ -19,9 +19,23 @@ async function sqlConnector (fastify, options) {
         process.exit(-1)
     })
 
+    pool.on('connect', (client) => {
+        fastify.log.info('SQL connect event')
+    })
+
+    pool.on('acquire', (client) => {
+        fastify.log.info('SQL acquire event')
+        console.time('QueryTimeExec')
+    })
+
+    pool.on('remove', (client) => {
+        fastify.log.info('SQL remove event')
+    })
+
     try {
         const client = await pool.connect()
         await client.query('SELECT NOW()')
+        console.timeEnd('QueryTimeExec')
         
         fastify.log.info('SQL Connected!')
         await client.release()

@@ -2,6 +2,7 @@
 const fs = require('fs');
 const queryHelpers = require('./query');
 const authHelpers = require('./auth');
+const notificationHelpers = require('./notification');
 
 exports.isArray = (arr) => {
     return (!!arr) && (arr.constructor === Array)
@@ -39,3 +40,5 @@ exports.readFile = (path) => {
 exports.query = queryHelpers;
 
 exports.auth = authHelpers;
+
+exports.notification = notificationHelpers;

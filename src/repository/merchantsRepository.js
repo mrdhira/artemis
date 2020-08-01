@@ -24,7 +24,10 @@ exports.getAllMerchants = (sql) => {
                 ) AS D
                     ON B.id = D.merchant_id
                 `)
-            .then(data => data.rows ? data.rows : [])
+            .then(data => {
+                console.timeEnd('QueryTimeExec')
+                return data.rows ? data.rows : []
+            })
     } catch (err) {
         throw err;
     }
@@ -40,7 +43,10 @@ exports.getMerchantsByIDWithUsers = (sql, id) => {
                 JOIN user_merchants AS B
                 ON A.id = B.user_id
                 WHERE B.id = $1`, [id])
-            .then(data => data.rows ? data.rows[0] : null)
+            .then(data => {
+                console.timeEnd('QueryTimeExec')
+                return data.rows ? data.rows[0] : null
+            })
     } catch (err) {
         throw err;
     }
@@ -73,7 +79,10 @@ exports.getMerchantRatingsByMerchantID = (sql, merchant_id) => {
                 WHERE A.merchant_id = $1
                 GROUP BY A.merchant_id
             `, [merchant_id])
-            .then(data => data.rows ? data.rows : { merchant_id, total_ratings: 0, ratings: 0} )
+            .then(data => {
+                console.timeEnd('QueryTimeExec')
+                return data.rows ? data.rows : { merchant_id, total_ratings: 0, ratings: 0} 
+            })
     } catch (err) {
         throw err
     }
@@ -87,7 +96,10 @@ exports.getMerchantsByUserID = (sql, user_id) => {
     try {
         return sql
             .query('SELECT * FROM user_merchants WHERE user_id = $1', [user_id])
-            .then(data => data.rows ? data.rows[0] : null)
+            .then(data => {
+                console.timeEnd('QueryTimeExec')
+                return data.rows ? data.rows[0] : null
+            })
     } catch (err) {
         throw err;
     }
@@ -109,6 +121,7 @@ exports.createMerchants = async (sql, user_id, address = null, operational_hour 
                     {user_id, address, operational_hour, facility, latitude, longtitude}, 'user_merchants'),
                     [user_id, address, operational_hour, facility, latitude, longtitude]
                 )
+        console.timeEnd('QueryTimeExec')
         return this.getMerchantsByUserID(sql, user_id)
     } catch (err) {
         throw err;
@@ -129,7 +142,10 @@ exports.updateMerchants = (sql, id, data) => {
                     data, 'user_merchants', {id}
                 ), Object.values(data)
             )
-            .then(data => data.rows ? data.rows[0] : null)
+            .then(data => {
+                console.timeEnd('QueryTimeExec')
+                return data.rows ? data.rows[0] : null
+            })
     } catch (err) {
         throw err;
     }
@@ -139,7 +155,10 @@ exports.getMerchantsTreatmentsByMerchantID = (sql, merchant_id) => {
     try {
         return sql
             .query('SELECT * FROM merchant_services WHERE merchant_id = $1', [merchant_id])
-            .then(data => data.rows ? data.rows : [])
+            .then(data => {
+                console.timeEnd('QueryTimeExec')
+                return data.rows ? data.rows : []
+            })
     } catch (err) {
         throw err
     }
@@ -149,7 +168,10 @@ exports.getMerchantsTreatmentsByID = (sql, id) => {
     try {
         return sql
             .query('SELECT * FROM merchant_services WHERE id = $1', [id])
-            .then(data => data.rows ? data.rows[0] : null )
+            .then(data => {
+                console.timeEnd('QueryTimeExec')
+                return data.rows ? data.rows[0] : null 
+            })
     } catch (err) {
         throw err
     }
@@ -163,7 +185,8 @@ exports.addMerchantsTreatments = async (sql, data) => {
                 .insertQuery(
                     data, 'merchant_services'),
                     Object.values(data)
-                )   
+                )
+        console.timeEnd('QueryTimeExec')
         return this.getMerchantsTreatmentsByMerchantID(sql, data.merchant_id)
     } catch (err) {
         throw err
@@ -179,16 +202,19 @@ exports.updateMerchantsTreatments = async (sql, id, data) => {
                     data, 'merchant_services', {id}),
                     Object.values(data)
             )
-            .then(data => data.rows ? data.rows[0] : null)
+        console.timeEnd('QueryTimeExec')
+        return 1
     } catch (err) {
         throw err
     }
 }
 
-exports.deleteMerchantsTreatments = (sql, id) => {
+exports.deleteMerchantsTreatments = async (sql, id) => {
     try {
-        return sql
+        await sql
             .query('DELETE FROM merchant_services WHERE id = $1', [id])
+        console.timeEnd('QueryTimeExec')
+        return 1
     } catch (err) {
         throw err
     }

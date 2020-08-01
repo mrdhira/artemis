@@ -34,10 +34,10 @@ const MERCHANT_SERVICE_DATA = [
  */
 exports.register = async (req, res) => {
     console.log('request body: ', req.body);
-    const { full_name, email, phone, password, type } = req.body;
+    const { full_name, email, phone, password, type, token: device_token } = req.body;
     
     try {
-        const data = await services.users.register(req.sql, full_name, email, phone, password, type)
+        const data = await services.users.register(req.sql, full_name, email, phone, password, type, device_token)
         if (data) {
             const tokenData = {
                 id: data.user.id,
@@ -64,10 +64,10 @@ exports.register = async (req, res) => {
  */
 exports.login = async (req, res) => {
     console.log('request body: ', req.body)
-    const { email, password, type } = req.body
+    const { email, password, type, token: device_token } = req.body
 
     try {
-        const data = await services.users.login(req.sql, email, password, type)
+        const data = await services.users.login(req.sql, email, password, type, device_token)
         if (data) {
             if (data.invalidPassword) {
                 return helpers.response(res, 422, 'Password not match.', false, {})
@@ -85,6 +85,24 @@ exports.login = async (req, res) => {
         } else {
             return helpers.response(res, 404, 'User not found.', false, {})
         }
+    } catch (err) {
+        console.error(err)
+        return helpers.response(res, 500, 'Internal server error.', true, {})
+    }
+}
+
+/**
+ * POST /users/logout
+ * @param {*} req 
+ * @param {*} res 
+ */
+exports.logout = async (req, res) => {
+    console.log('request body: ', req.body)
+    const { token: device_token } = req.body
+
+    try {
+        await services.users.logout(req.sql, req,body.decoded.id, device_token)
+        return helpers.response(res, 200, 'OK', false, {})
     } catch (err) {
         console.error(err)
         return helpers.response(res, 500, 'Internal server error.', true, {})

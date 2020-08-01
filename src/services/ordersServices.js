@@ -1,3 +1,4 @@
+const helpers = require('../helpers')
 const repository = require('../repository');
 const { ORDER_STATUS } = require('../models/orders');
 
@@ -116,6 +117,27 @@ exports.createOrders = async (sql, id, merchant_id, booking_datetime, pets) => {
         console.log('Done')
         console.log('===============')
 
+        console.log('Push notification to merchant')
+        const userMerchants = await repository.merchants.getMerchantsByID(sql, merchant_id)
+        const merchantUserTokens = await repository.users.getActiveUserTokenByUserID(sql, userMerchants.user_id)
+        const tokens = []
+        for (const userToken of merchantUserTokens) {
+            tokens.push(userToken.token)
+        }
+        const message = {
+            notification: {
+                title: 'Anda mendapatkan pesanan baru.',
+                body: 'Anda mendapatkan pesanan baru.'
+            },
+            data: {
+                order_id: data.orders.id,
+                screen: 'Order_Coming_Detail_Merchant'
+            }
+        }
+        const options = { priority: 'high' }
+        await helpers.notification.sendPushNotification(tokens, message, options)
+        console.log('Done pushing notification to merchant')
+
         return data
     } catch (err) {
         throw err
@@ -144,6 +166,45 @@ exports.updateStatusOrders = async (sql, id, status) => {
                 return { ordersStatusInvalid: true}
             } else {
                 await repository.orders.updateStatusOrders(sql, id, status)
+                
+                console.log('Push notification to customer')
+                const userTokens = await repository.users.getActiveUserTokenByUserID(sql, orders.customer_id)
+                const tokens = []
+                for (const userToken of userTokens) {
+                    tokens.push(userToken.token)
+                }
+                const message = {}
+                message.data.order_id = id
+                switch (status) {
+                    case 2:
+                        message.notification = {
+                            title: 'Pesanan anda telah diterima oleh veterinarian.',
+                            body: 'Pesanan anda telah diterima oleh veterinarian.'
+                        }
+                        message.data.screen = 'ORDER_DETAIL_CUSTOMER'
+                    case 3:
+                        message.notification = {
+                            title: 'Pesanan anda telah ditolak oleh veterinarian.',
+                            body: 'Pesanan anda telah ditolak oleh veterinarian.'
+                        }
+                        message.data.screen = 'Order_History_Detail_Customer'
+                    case 4:
+                        message.notification = {
+                            title: 'Pesanan anda telah diprogress oleh veterinarian.',
+                            body: 'Pesanan anda telah diprogress oleh veterinarian.'
+                        }
+                        message.data.screen = 'ORDER_DETAIL_CUSTOMER'
+                    case 5:
+                        message.notification = {
+                            title: 'Pesanan anda telah diselesaikan oleh veterinarian.',
+                            body: 'Pesanan anda telah diselesaikan oleh veterinarian, silahkan memberikan ratings.'
+                        }
+                        message.data.screen = 'Order_History_Detail_Customer'
+                }
+                const options = { priority: 'high' }
+                await helpers.notification.sendPushNotification(tokens, message, options)
+                console.log('Done pushing notification to customer')
+
                 return 1
             }
         }

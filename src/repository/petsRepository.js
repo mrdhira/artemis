@@ -9,7 +9,10 @@ exports.getPetsByID = (sql, id) => {
     try {
         return sql
             .query('SELECT * FROM user_pets WHERE id = $1', [id])
-            .then(data => data.rows ? data.rows[0] : null)
+            .then(data => {
+                console.timeEnd('QueryTimeExec')
+                return data.rows ? data.rows[0] : null
+            })
     } catch (err) {
         throw err;
     }
@@ -24,7 +27,10 @@ exports.getPetsByUserID = (sql, user_id) => {
     try {
         return sql
             .query('SELECT * FROM user_pets WHERE user_id = $1', [user_id])
-            .then(data => data.rows ? data.rows : [])
+            .then(data => {
+                console.timeEnd('QueryTimeExec')
+                return data.rows ? data.rows : []
+            })
     } catch (err) {
         throw err;
     }
@@ -44,6 +50,7 @@ exports.addPets = async (sql, data) => {
                     data, 'user_pets'),
                     Object.values(data)
                 )   
+        console.timeEnd('QueryTimeExec')
         return this.getPetsByUserID(sql, data.user_id)
     } catch (err) {
         throw err
@@ -56,16 +63,17 @@ exports.addPets = async (sql, data) => {
  * @param {*} id 
  * @param {*} data 
  */
-exports.updatePets = (sql, id, data) => {
+exports.updatePets = async (sql, id, data) => {
     try {
-        return sql
+        await sql
             .query(
                 queryHelpers
                 .updateQuery(
                     data, 'user_pets', {id}
                 ), Object.values(data)
             )
-            .then(data => data.rows ? data.rows[0] : null)
+        console.timeEnd('QueryTimeExec')
+        return 1
     } catch (err) {
         throw err
     }
@@ -76,10 +84,12 @@ exports.updatePets = (sql, id, data) => {
  * @param {*} sql 
  * @param {*} id 
  */
-exports.deletePets = (sql, id) => {
+exports.deletePets = async (sql, id) => {
     try {
-        return sql
+        await sql
             .query('DELETE FROM user_pets WHERE id = $1', [id])
+        console.timeEnd('QueryTimeExec')
+        return 1 
     } catch (err) {
         throw err
     }
@@ -104,7 +114,10 @@ exports.getMedicalRecordsByPetID = (sql, pet_id) => {
                 WHERE A.pet_id = $1 AND A.status = 1
                 ORDER BY B.booking_datetime ASC, C.service_name ASC            
             `, [pet_id])
-            .then(data => data.rows ? data.rows : [])
+            .then(data => {
+                console.timeEnd('QueryTimeExec')
+                return data.rows ? data.rows : []
+            })
     } catch (err) {
         throw err
     }

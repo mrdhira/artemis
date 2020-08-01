@@ -7,7 +7,9 @@ const config = {
     host: process.env.NODE_HOST || '0.0.0.0',
     port: process.env.NODE_PORT || 3000,
     envConfig,
-    dbConfig
+    dbConfig,
+    firebaseConfig: require('../credentials/serviceAccount.json'),
+    firebaseDBURL: process.env.firebase_databaseURL,
 }
 
 module.exports = config

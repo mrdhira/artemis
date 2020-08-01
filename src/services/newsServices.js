@@ -16,7 +16,6 @@ exports.getNewsList = async (sql) => {
         }
         result.unshift(news)
     }
-    console.log('Result: ', result)
     return result
 }
 

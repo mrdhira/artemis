@@ -62,12 +62,19 @@ exports.createUser = async (sql, full_name, email, phone, password) => {
  * @param {*} id 
  * @param {*} data 
  */
-exports.updateUser = (sql, id, data) => {
-    sql.query(queryHelpers.updateQuery(data, 'users', {id}), Object.values(data), (err, data) => {
+exports.updateUser = async (sql, id, data) => {
+    try {
+        await sql
+            .query(
+                queryHelpers
+                    .updateQuery(data, 'users', {id}),
+                    Object.values(data)
+            )
         console.timeEnd('QueryTimeExec')
-        if (err) console.error(err)
-        return err, data[0]
-    })
+        return 1
+    } catch (err) {
+        throw err
+    }
 }
 
 exports.getActiveUserTokenByUserID = (sql, user_id) => {

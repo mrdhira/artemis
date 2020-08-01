@@ -34,8 +34,11 @@ const MERCHANT_SERVICE_DATA = [
  */
 exports.register = async (req, res) => {
     console.log('request body: ', req.body);
-    const { full_name, email, phone, password, type, token: device_token } = req.body;
+    const { full_name, email, phone, password, type, /* token: device_token */ } = req.body;
     
+    // Sementara
+    const device_token = req.body.token ? req.body.token : ""
+
     try {
         const data = await services.users.register(req.sql, full_name, email, phone, password, type, device_token)
         if (data) {
@@ -64,7 +67,10 @@ exports.register = async (req, res) => {
  */
 exports.login = async (req, res) => {
     console.log('request body: ', req.body)
-    const { email, password, type, token: device_token } = req.body
+const { email, password, type, /* token: device_token */ } = req.body
+
+    // Sementara
+    const device_token = req.body.token ? req.body.token : ""
 
     try {
         const data = await services.users.login(req.sql, email, password, type, device_token)

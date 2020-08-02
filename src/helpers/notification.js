@@ -13,6 +13,7 @@ exports.sendPushNotification = async (token, message, options) => {
             .sendToDevice(token, message, options)
             .then((response) => {
                 console.log('Response from Send Push Notification => ', response)
+                console.log('Results => ', response.results)
                 return response
             })
     } catch (err) {

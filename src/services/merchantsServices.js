@@ -24,9 +24,9 @@ exports.getMerchantsList = async (sql, query) => {
     const merchantList = await repository.merchants.getAllMerchants(sql, orderby);
     for (let merchant of merchantList) {
         merchant.file = null
-        if (merchant.picture_id && merchant.url) {
-            merchant.file = await helpers.readFile(merchant.url)
-        }
+        // if (merchant.picture_id && merchant.url) {
+        //     merchant.file = await helpers.readFile(merchant.url)
+        // }
         result.push(merchant)
     }
     return result;

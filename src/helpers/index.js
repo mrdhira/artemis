@@ -19,6 +19,11 @@ exports.response = (res, code, message, error, data) => {
         .send({ code, message, error, data })
 }
 
+exports.responseFile = (res, code, filePath) => {
+    res
+        .sendFile(filePath)
+}
+
 exports.fileFilter = (request, file, cb) => {
     console.log('File: ', file)
 

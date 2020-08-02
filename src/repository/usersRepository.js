@@ -82,10 +82,10 @@ exports.getActiveUserTokenByUserID = (sql, user_id) => {
         return sql
             .query(`
                 SELECT * FROM user_tokens WHERE user_id = $1 AND status = 1 ORDER BY created_at DESC
-            `, [user_id, token])
+            `, [user_id])
             .then(data => {
                 console.timeEnd('QueryTimeExec')
-                data.rows ? data.rows : []
+                return data.rows ? data.rows : []
             })
     } catch (err) {
         throw err

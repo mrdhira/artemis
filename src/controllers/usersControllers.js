@@ -37,7 +37,7 @@ exports.register = async (req, res) => {
     const { full_name, email, phone, password, type, /* token: device_token */ } = req.body;
     
     // Sementara
-    const device_token = req.body.token ? req.body.token : ""
+    const device_token = req.body.token ? req.body.token : "cwWztqndSu65mdZ9gB43N5:APA91bHn-H033LQZubYdHBpVeD9cPwzVZ0H-UBa_qt5KTuhcIbH1vVot-GlYVfo1vQGmf7NusLcb8TBkFBJ4G4DPlLnAFGEFbzYLtCQJ1qPlBg42LA0nmj3K42fmSdao9FwCN_xnf_W6"
 
     try {
         const data = await services.users.register(req.sql, full_name, email, phone, password, type, device_token)
@@ -70,7 +70,7 @@ exports.login = async (req, res) => {
 const { email, password, type, /* token: device_token */ } = req.body
 
     // Sementara
-    const device_token = req.body.token ? req.body.token : ""
+    const device_token = req.body.token ? req.body.token : "cwWztqndSu65mdZ9gB43N5:APA91bHn-H033LQZubYdHBpVeD9cPwzVZ0H-UBa_qt5KTuhcIbH1vVot-GlYVfo1vQGmf7NusLcb8TBkFBJ4G4DPlLnAFGEFbzYLtCQJ1qPlBg42LA0nmj3K42fmSdao9FwCN_xnf_W6"
 
     try {
         const data = await services.users.login(req.sql, email, password, type, device_token)
@@ -107,7 +107,7 @@ exports.logout = async (req, res) => {
     const { token: device_token } = req.body
 
     try {
-        await services.users.logout(req.sql, req,body.decoded.id, device_token)
+        await services.users.logout(req.sql, req.body.decoded.id, device_token)
         return helpers.response(res, 200, 'OK', false, {})
     } catch (err) {
         console.error(err)
@@ -270,7 +270,7 @@ exports.merchantUpdateTreatment = async (req, res) => {
         await services.users.merchantUpdateTreatment(req.sql, id, data)
 
         return helpers.response(res, 200, 'Update successfully.', false, {})
-    } catch (error) {
+    } catch (err) {
         console.error(err)
         return helpers.response(res, 500, 'Internal server error.', true, {})
     }

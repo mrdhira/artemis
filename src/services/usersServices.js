@@ -82,7 +82,7 @@ exports.login = async (sql, email, password, type, device_token) => {
  */
 exports.logout = async (sql, user_id, device_token) => {
     try {
-        const user_tokens = await repository.users.getUserTokenByUserIDAndToken(sql, user_id, token)
+        const user_tokens = await repository.users.getUserTokenByUserIDAndToken(sql, user_id, device_token)
         if (user_tokens) {
             await repository.users.updateUserToken(sql, user_tokens.id, 0)
         }

@@ -18,6 +18,7 @@ module.exports = (fastify, options, next) => {
     fastify.route({
         method: 'POST',
         url: '/logout',
+        preHandler: (req, res, done) => authHelpers.validateToken(req, res, done),
         handler: (req, res) => controllers.users.logout(req, res)
     })
 

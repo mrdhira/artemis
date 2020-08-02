@@ -130,12 +130,16 @@ exports.createOrders = async (sql, id, merchant_id, booking_datetime, pets) => {
                 body: 'Anda mendapatkan pesanan baru.'
             },
             data: {
-                order_id: data.orders.id,
+                order_id: String(data.orders.id),
                 screen: 'Order_Coming_Detail_Merchant'
             }
         }
         const options = { priority: 'high' }
-        await helpers.notification.sendPushNotification(tokens, message, options)
+        try {
+            await helpers.notification.sendPushNotification(tokens, message, options)
+        } catch (err) {
+            console.log('Error on Push Notification when createOrders => ', err)
+        }
         console.log('Done pushing notification to merchant')
 
         return data
@@ -174,7 +178,9 @@ exports.updateStatusOrders = async (sql, id, status) => {
                     tokens.push(userToken.token)
                 }
                 const message = {}
-                message.data.order_id = id
+                message.data = {
+                    order_id: String(id)
+                }
                 switch (status) {
                     case 2:
                         message.notification = {
@@ -202,7 +208,11 @@ exports.updateStatusOrders = async (sql, id, status) => {
                         message.data.screen = 'Order_History_Detail_Customer'
                 }
                 const options = { priority: 'high' }
-                await helpers.notification.sendPushNotification(tokens, message, options)
+                try {
+                    await helpers.notification.sendPushNotification(tokens, message, options)
+                } catch (err) {
+                    console.log('Error on Push Notification when updateStatusOrder => ', err)
+                }
                 console.log('Done pushing notification to customer')
 
                 return 1

@@ -188,24 +188,28 @@ exports.updateStatusOrders = async (sql, id, status) => {
                             body: 'Pesanan anda telah diterima oleh veterinarian.'
                         }
                         message.data.screen = 'ORDER_DETAIL_CUSTOMER'
+                        break
                     case 3:
                         message.notification = {
                             title: 'Pesanan anda telah ditolak oleh veterinarian.',
                             body: 'Pesanan anda telah ditolak oleh veterinarian.'
                         }
                         message.data.screen = 'Order_History_Detail_Customer'
+                        break
                     case 4:
                         message.notification = {
                             title: 'Pesanan anda telah diprogress oleh veterinarian.',
                             body: 'Pesanan anda telah diprogress oleh veterinarian.'
                         }
                         message.data.screen = 'ORDER_DETAIL_CUSTOMER'
+                        break
                     case 5:
                         message.notification = {
                             title: 'Pesanan anda telah diselesaikan oleh veterinarian.',
                             body: 'Pesanan anda telah diselesaikan oleh veterinarian, silahkan memberikan ratings.'
                         }
                         message.data.screen = 'Order_History_Detail_Customer'
+                        break
                 }
                 const options = { priority: 'high' }
                 try {

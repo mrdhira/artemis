@@ -19,7 +19,7 @@ exports.getPetsList = async (sql, user_id) => {
             }
         }
 
-        result.push({...pet, pictures})
+        result.unshift({...pet, pictures})
     }
 
     return result

@@ -27,7 +27,7 @@ exports.getMerchantsList = async (sql, query) => {
         // if (merchant.picture_id && merchant.url) {
         //     merchant.file = await helpers.readFile(merchant.url)
         // }
-        result.push(merchant)
+        result.unshift(merchant)
     }
     return result;
 }

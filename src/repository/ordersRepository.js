@@ -25,6 +25,7 @@ exports.getOrderListByCustomerID = (sql, customer_id, status) => {
                 JOIN users AS C
                     ON B.user_id = C.id
                 WHERE A.customer_id = $1 AND status IN(${status})
+                ORDER BY A.created_at DESC
                 `,
             [customer_id])
             .then(data => {
@@ -46,6 +47,7 @@ exports.getOrderListByMerchantID = (sql, merchant_id, status) => {
                 JOIN users AS B
                     ON A.customer_id = B.id
                 WHERE A.merchant_id = $1 AND status IN(${status})
+                ORDER BY A.created_at DESC
                 `,
             [merchant_id])
             .then(data => {

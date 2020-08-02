@@ -124,14 +124,18 @@ exports.createOrders = async (sql, id, merchant_id, booking_datetime, pets) => {
         for (const userToken of merchantUserTokens) {
             tokens.unshift(userToken.token)
         }
+
+        const orderDetail = await this.getOrdersDetail(sql, data.orders.id)
+
         const message = {
             notification: {
                 title: 'Anda mendapatkan pesanan baru.',
                 body: 'Anda mendapatkan pesanan baru.'
             },
             data: {
-                order_id: String(data.orders.id),
-                screen: 'Order_Coming_Detail_Merchant'
+                to: 'merchant',
+                screen: 'Order_Coming_Detail_Merchant',
+                order: orderDetail,
             }
         }
         const options = { priority: 'high' }
@@ -177,9 +181,13 @@ exports.updateStatusOrders = async (sql, id, status) => {
                 for (const userToken of userTokens) {
                     tokens.unshift(userToken.token)
                 }
+
+                const orderDetail = await this.getOrdersDetail(sql, data.orders.id)
+
                 const message = {}
                 message.data = {
-                    order_id: String(id)
+                    to: 'customer',
+                    order: orderDetail
                 }
                 switch (status) {
                     case 2:

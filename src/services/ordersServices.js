@@ -195,7 +195,7 @@ exports.updateStatusOrders = async (sql, id, status) => {
                             title: 'Pesanan anda telah diterima oleh veterinarian.',
                             body: 'Pesanan anda telah diterima oleh veterinarian.'
                         }
-                        message.data.screen = 'ORDER_DETAIL_CUSTOMER'
+                        message.data.screen = 'Order_Detail_Customer'
                         break
                     case 3:
                         message.notification = {
@@ -209,7 +209,7 @@ exports.updateStatusOrders = async (sql, id, status) => {
                             title: 'Pesanan anda telah diprogress oleh veterinarian.',
                             body: 'Pesanan anda telah diprogress oleh veterinarian.'
                         }
-                        message.data.screen = 'ORDER_DETAIL_CUSTOMER'
+                        message.data.screen = 'Order_Detail_Customer'
                         break
                     case 5:
                         message.notification = {

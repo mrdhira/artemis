@@ -185,7 +185,7 @@ exports.merchantAddTreatment = (sql, merchant_id, data) => {
  * @param {*} res 
  */
 exports.merchantUpdateTreatment = async (sql, id, data) => {
-    data.update_at = new Date()
+    data.updated_at = new Date()
 
     const updateTreatment = await repository.merchants.updateMerchantsTreatments(sql, id, data)
     console.log('updateTreatment: ', updateTreatment)

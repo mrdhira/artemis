@@ -8,9 +8,10 @@ const helpers = require('../helpers')
  */
 exports.getMerchantsList = async (req, res) => {
     console.log('request body: ', req.body);
+    console.log('request query params: ', req.query)
 
     try {
-        const data = await services.merchants.getMerchantsList(req.sql)
+        const data = await services.merchants.getMerchantsList(req.sql, req.query)
         return helpers.response(res, 200, 'OK', false, data)
     } catch (err) {
         console.error(err)

@@ -1,14 +1,27 @@
 const repository = require('../repository');
 const helpers = require('../helpers')
 
+const MERCHANT_ORDER_BY = [
+    'ratings'
+]
+
 /**
  * 
  * @param {*} req
  * @param {*} res
  */
-exports.getMerchantsList = async (sql) => {
+exports.getMerchantsList = async (sql, query) => {
     const result = []
-    const merchantList = await repository.merchants.getAllMerchants(sql);
+    let orderby = ''
+    if (
+        (query.filter && MERCHANT_ORDER_BY.includes(query.filter))
+        &&
+        query.order && (query.order.toUpperCase() === 'ASC' || query.order.toUpperCase() === 'DESC')
+    ) {
+        if (query.filter)
+        orderby = `ORDER BY ${query.filter} ${query.order}`
+    }
+    const merchantList = await repository.merchants.getAllMerchants(sql, orderby);
     for (let merchant of merchantList) {
         merchant.file = null
         if (merchant.picture_id && merchant.url) {

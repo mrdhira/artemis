@@ -1,6 +1,6 @@
 const queryHelpers = require('../helpers').query
 
-exports.getAllMerchants = (sql) => {
+exports.getAllMerchants = (sql, orderby) => {
     try {
         return sql
             .query(`
@@ -23,6 +23,7 @@ exports.getAllMerchants = (sql) => {
                     GROUP BY A.merchant_id
                 ) AS D
                     ON B.id = D.merchant_id
+                ${orderby}
                 `)
             .then(data => {
                 console.timeEnd('QueryTimeExec')

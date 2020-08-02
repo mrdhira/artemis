@@ -172,11 +172,11 @@ exports.updateProfile = async (req, res) => {
  */
 exports.changePassword = async (req, res) => {
     console.log('request body: ', req.body);
-    const { oldPassword, newPasswoord } = req.body;
+    const { oldPassword, newPassword } = req.body;
     const { id } = req.body.decoded
 
     try {
-        const success = await services.users.changePassword(req.sql, id, oldPassword, newPasswoord)
+        const success = await services.users.changePassword(req.sql, id, oldPassword, newPassword)
         if (success.passwordNotMatch) {
             return helpers.response(res, 422, 'Password not match.', false, {})
         }

@@ -34,10 +34,7 @@ const MERCHANT_SERVICE_DATA = [
  */
 exports.register = async (req, res) => {
     console.log('request body: ', req.body);
-    const { full_name, email, phone, password, type, /* token: device_token */ } = req.body;
-    
-    // Sementara
-    const device_token = req.body.token ? req.body.token : "cwWztqndSu65mdZ9gB43N5:APA91bHn-H033LQZubYdHBpVeD9cPwzVZ0H-UBa_qt5KTuhcIbH1vVot-GlYVfo1vQGmf7NusLcb8TBkFBJ4G4DPlLnAFGEFbzYLtCQJ1qPlBg42LA0nmj3K42fmSdao9FwCN_xnf_W6"
+    const { full_name, email, phone, password, type, token: device_token } = req.body;
 
     try {
         const data = await services.users.register(req.sql, full_name, email, phone, password, type, device_token)
@@ -67,10 +64,7 @@ exports.register = async (req, res) => {
  */
 exports.login = async (req, res) => {
     console.log('request body: ', req.body)
-const { email, password, type, /* token: device_token */ } = req.body
-
-    // Sementara
-    const device_token = req.body.token ? req.body.token : "cwWztqndSu65mdZ9gB43N5:APA91bHn-H033LQZubYdHBpVeD9cPwzVZ0H-UBa_qt5KTuhcIbH1vVot-GlYVfo1vQGmf7NusLcb8TBkFBJ4G4DPlLnAFGEFbzYLtCQJ1qPlBg42LA0nmj3K42fmSdao9FwCN_xnf_W6"
+    const { email, password, type, token: device_token } = req.body
 
     try {
         const data = await services.users.login(req.sql, email, password, type, device_token)

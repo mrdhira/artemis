@@ -5,6 +5,7 @@ services:
     container_name: artemis
     image: dhirawigata/artemis
     build: .
+    restart: always
     env_file:
       - ${HOME}/env/artemis/.env
     volumes: 

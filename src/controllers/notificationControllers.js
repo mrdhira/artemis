@@ -8,12 +8,38 @@ exports.saveUserToken = async (req, res) => {
     const status = 1
 
     try {
-        const userTokens = req.sql.query(
-            helpers.query.insertQuery(
-                { user_id, token, status }, 'user_tokens'
-            ), [user_id, token, status]
-        )
-        console.timeEnd('QueryTimeExec')
+        let userTokens = {}
+
+        const checkTokens = req.sql.query(
+            `SELECT * FROM user_tokens WHERE user_id = $1 AND token = $2`,
+            [user_id, token]
+        ).then(data => {
+            console.timeEnd('QueryTimeExec')
+            return data.rows ? data.rows[0] : null
+        })
+
+        if (!checkTokens) {
+            userTokens = req.sql.query(
+                helpers.query.insertQuery(
+                    { user_id, token, status }, 'user_tokens'
+                ), [user_id, token, status]
+            )
+            console.timeEnd('QueryTimeExec')
+        } else if (checkTokens && checkTokens.status == 0) {
+            const status = 1
+            await req.sql.query(
+                helpers.query.updateQuery(
+                    {status}, 'user_tokens', {id},
+                    [status]
+                )
+            )
+            console.timeEnd('QueryTimeExec')
+
+            checkTokens.status = 1
+        }
+
+        userTokens = checkTokens
+
         return helpers.response(res, 200, 'Token Inserted.', false, userTokens)
     } catch (err) {
         console.error(err)

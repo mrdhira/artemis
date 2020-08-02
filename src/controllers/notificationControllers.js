@@ -13,6 +13,7 @@ exports.saveUserToken = async (req, res) => {
                 { user_id, token, status }, 'user_tokens'
             ), [user_id, token, status]
         )
+        console.timeEnd('QueryTimeExec')
         return helpers.response(res, 200, 'Token Inserted.', false, userTokens)
     } catch (err) {
         console.error(err)

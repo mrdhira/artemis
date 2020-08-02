@@ -61,7 +61,10 @@ exports.getMerchantsByID = (sql, id) => {
     try {
         return sql
             .query('SELECT * FROM user_merchants WHERE id = $1', [id])
-            .then(data => data.rows ? data.rows[0] : null)
+            .then(data => {
+                console.timeEnd('QueryTimeExec')
+                return data.rows ? data.rows[0] : null
+            })
     } catch (err) {
         throw err;
     }

@@ -21,15 +21,10 @@ exports.getMerchantsList = async (sql, query) => {
         if (query.filter)
         orderby = `ORDER BY ${query.filter} ${query.order}`
     }
+
     const merchantList = await repository.merchants.getAllMerchants(sql, orderby);
-    for (let merchant of merchantList) {
-        merchant.file = null
-        // if (merchant.picture_id && merchant.url) {
-        //     merchant.file = await helpers.readFile(merchant.url)
-        // }
-        result.unshift(merchant)
-    }
-    return result;
+    
+    return merchantList
 }
 
 /**

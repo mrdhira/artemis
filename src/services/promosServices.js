@@ -14,7 +14,7 @@ exports.getPromosList = async (sql) => {
         if (promos.picture_id && promos.url) {
             promos.file = await helpers.readFile(promos.url)
         }
-        result.unshift(promos)
+        result.push(promos)
     }
     return result
 }

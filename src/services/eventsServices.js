@@ -14,7 +14,7 @@ exports.getEventsList = async (sql) => {
         if (events.picture_id && events.url) {
             events.file = await helpers.readFile(events.url)
         }
-        result.unshift(events)
+        result.push(events)
     }
     return result
 }

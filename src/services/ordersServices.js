@@ -35,7 +35,7 @@ exports.getOrdersDetail = async (sql, id) => {
             const order_pets = await repository.orders.getOrderPetsByOrderID(sql, orders.id)
             for (const order_pet of order_pets) {
                 order_pet_services = await repository.orders.getOrderPetServicesByOrderPetID(sql, order_pet.id)
-                orders.order_pets.unshift({
+                orders.order_pets.push({
                     ...order_pet,
                     order_pet_services
                 })
@@ -105,9 +105,9 @@ exports.createOrders = async (sql, id, merchant_id, booking_datetime, pets) => {
                 console.log('---------------')
                 console.log('Order Pet Service: ', order_pet_service);
 
-                order_pet_services.unshift(order_pet_service)
+                order_pet_services.push(order_pet_service)
             }
-            data.order_pets.unshift({
+            data.order_pets.push({
                 ...order_pet,
                 order_pet_services
             })
@@ -122,7 +122,7 @@ exports.createOrders = async (sql, id, merchant_id, booking_datetime, pets) => {
         const merchantUserTokens = await repository.users.getActiveUserTokenByUserID(sql, userMerchants.user_id)
         const tokens = []
         for (const userToken of merchantUserTokens) {
-            tokens.unshift(userToken.token)
+            tokens.push(userToken.token)
         }
 
         const orderDetail = await this.getOrdersDetail(sql, data.orders.id)
@@ -183,7 +183,7 @@ exports.updateStatusOrders = async (sql, id, status) => {
                 const userTokens = await repository.users.getActiveUserTokenByUserID(sql, orders.customer_id)
                 const tokens = []
                 for (const userToken of userTokens) {
-                    tokens.unshift(userToken.token)
+                    tokens.push(userToken.token)
                 }
 
                 const orderDetail = await this.getOrdersDetail(sql, orders.id)
@@ -238,15 +238,6 @@ exports.updateStatusOrders = async (sql, id, status) => {
     } catch (err) {
         throw err
     }
-}
-
-/**
- * 
- * @param {*} req 
- * @param {*} res 
- */
-exports.addPetMedicalRecords = async (sql) => {
-    return 1
 }
 
 /**

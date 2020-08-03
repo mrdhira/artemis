@@ -126,10 +126,10 @@ exports.createOrders = async (sql, id, merchant_id, booking_datetime, pets) => {
         }
 
         const orderDetail = await this.getOrdersDetail(sql, data.orders.id)
-        const userDetail = await repository.users.getUserByID(sql, userMerchants.user_id)
+        const customerDetail = await repository.users.getUserByID(sql, id)
         const order = JSON.stringify({
             ...orderDetail,
-            user: userDetail,
+            customer: customerDetail,
             merchant: userMerchants
         })
 
@@ -187,10 +187,12 @@ exports.updateStatusOrders = async (sql, id, status) => {
                 }
 
                 const orderDetail = await this.getOrdersDetail(sql, orders.id)
-                const userDetail = await repository.users.getUserByID(sql, orders.customer_id)
+                const customerDetail = await repository.users.getUserByID(sql, orders.customer_id)
+                const merchantDetail = await repository.merchants.getMerchantsByID(sql, orders.merchant_id)
                 const order = JSON.stringify({
                     ...orderDetail,
-                    user: userDetail
+                    customer: customerDetail,
+                    merchant: merchantDetail
                 })
 
                 const message = {

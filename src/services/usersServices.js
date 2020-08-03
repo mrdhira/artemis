@@ -101,10 +101,6 @@ exports.getProfile = async (sql, id) => {
     let pictures = {}
     if (user.picture_id) {
         pictures = await repository.pictures.getById(sql, user.picture_id)
-        pictures.file = null
-        if (pictures.url) {
-            pictures.file = await helpers.readFile(pictures.url)
-        }
     }
     return { user, pictures }
 }
@@ -161,10 +157,6 @@ exports.getProfileMerchant = async (sql, id, merchant_id) => {
     let pictures = {}
     if (user.picture_id) {
         pictures = await repository.pictures.getById(sql, user.picture_id)
-        pictures.file = null
-        if (pictures.url) {
-            pictures.file = await helpers.readFile(pictures.url)
-        }
     }
     return { user, merchant, merchantServices, pictures }
 }

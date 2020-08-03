@@ -13,10 +13,6 @@ exports.getPetsList = async (sql, user_id) => {
         let pictures = {}
         if (pet.picture_id) {
             pictures = await repository.pictures.getById(sql, pet.picture_id)
-            pictures.file = null
-            if (pictures.url) {
-                pictures.file = await helpers.readFile(pictures.url)
-            }
         }
 
         result.push({...pet, pictures})
@@ -35,10 +31,6 @@ exports.getPetsDetail = async (sql, id) => {
     let pictures = {}
     if (pets.picture_id) {
         pictures = await repository.pictures.getById(sql, pets.picture_id)
-        pictures.file = null
-        if (pictures.url) {
-            pictures.file = await helpers.readFile(pictures.url)
-        }
     }
     const medicalRecords = await repository.pets.getMedicalRecordsByPetID(sql, id)
 

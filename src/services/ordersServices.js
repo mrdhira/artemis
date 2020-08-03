@@ -186,7 +186,7 @@ exports.updateStatusOrders = async (sql, id, status) => {
                     tokens.unshift(userToken.token)
                 }
 
-                const orderDetail = await this.getOrdersDetail(sql, data.orders.id)
+                const orderDetail = await this.getOrdersDetail(sql, orders.id)
                 const userDetail = await repository.users.getUserByID(sql, orders.customer_id)
                 const order = JSON.stringify({
                     ...orderDetail,

@@ -4,26 +4,33 @@ exports.getAllMerchants = (sql, orderby) => {
     try {
         return sql
             .query(`
-                SELECT A.id, A.picture_id, A.full_name, A.email, A.phone
-                    , B.id AS "merchant_id", B.address, B.operational_hour, B.facility, B.latitude, B.longtitude
-                    , C.url
-                    , D.ratings, D.total_ratings
-                FROM users AS A
-                JOIN user_merchants AS B
-                    ON A.id = B.user_id
-                LEFT JOIN pictures AS C
-                    ON A.picture_id = C.id
-                LEFT JOIN (
-                    SELECT A.merchant_id
-                        , COUNT(B.id) AS "total_ratings"
-                        , SUM(B.rating) / COUNT(B.id) AS "ratings"
-                    FROM orders AS A
-                    JOIN order_reviews AS B
-                        ON A.id = B.order_id
-                    GROUP BY A.merchant_id
-                ) AS D
-                    ON B.id = D.merchant_id
-                ${orderby}
+                    SELECT A.id, A.picture_id, A.full_name, A.email, A.phone
+                        , B.id AS "merchant_id", B.address, B.operational_hour, B.facility, B.latitude, B.longtitude
+                        , C.url
+                        , CASE
+                            WHEN D.ratings IS NULL THEN 0
+                            ELSE D.ratings
+                        END AS ratings
+                        , CASE
+                            WHEN D.total_ratings IS NULL THEN 0
+                            ELSE D.total_ratings
+                        END AS total_ratings
+                    FROM users AS A
+                    JOIN user_merchants AS B
+                            ON A.id = B.user_id
+                    LEFT JOIN pictures AS C
+                            ON A.picture_id = C.id
+                    LEFT JOIN (
+                            SELECT A.merchant_id
+                                    , COUNT(B.id) AS "total_ratings"
+                                    , SUM(B.rating) / COUNT(B.id) AS "ratings"
+                            FROM orders AS A
+                            JOIN order_reviews AS B
+                                    ON A.id = B.order_id
+                            GROUP BY A.merchant_id
+                    ) AS D
+                            ON B.id = D.merchant_id
+                    ${orderby}
                 `)
             .then(data => {
                 console.timeEnd('QueryTimeExec')

@@ -126,16 +126,20 @@ exports.createOrders = async (sql, id, merchant_id, booking_datetime, pets) => {
         }
 
         const orderDetail = await this.getOrdersDetail(sql, data.orders.id)
+        const userDetail = await repository.users.getUserByID(sql, userMerchants.user_id)
+        const order = JSON.stringify({
+            ...orderDetail,
+            user: userDetail,
+            merchant: userMerchants
+        })
 
         const message = {
-            notification: {
-                title: 'Anda mendapatkan pesanan baru.',
-                body: 'Anda mendapatkan pesanan baru.'
-            },
             data: {
+                title: 'Anda mendapatkan pesanan baru.',
+                body: 'Anda mendapatkan pesanan baru.',
                 to: 'merchant',
                 screen: 'Order_Coming_Detail_Merchant',
-                order: orderDetail,
+                order
             }
         }
         const options = { priority: 'high' }
@@ -183,43 +187,42 @@ exports.updateStatusOrders = async (sql, id, status) => {
                 }
 
                 const orderDetail = await this.getOrdersDetail(sql, data.orders.id)
+                const userDetail = await repository.users.getUserByID(sql, orders.customer_id)
+                const order = JSON.stringify({
+                    ...orderDetail,
+                    user: userDetail
+                })
 
-                const message = {}
-                message.data = {
-                    to: 'customer',
-                    order: orderDetail
+                const message = {
+                    data: {
+                        to: 'customer',
+                        order
+                    }
                 }
                 switch (status) {
                     case 2:
-                        message.notification = {
-                            title: 'Pesanan anda telah diterima oleh veterinarian.',
-                            body: 'Pesanan anda telah diterima oleh veterinarian.'
-                        }
+                        message.data.title = 'Pesanan anda telah diterima oleh veterinarian.'
+                        message.data.body = 'Pesanan anda telah diterima oleh veterinarian.'
                         message.data.screen = 'Order_Detail_Customer'
                         break
                     case 3:
-                        message.notification = {
-                            title: 'Pesanan anda telah ditolak oleh veterinarian.',
-                            body: 'Pesanan anda telah ditolak oleh veterinarian.'
-                        }
+                        message.data.title = 'Pesanan anda telah ditolak oleh veterinarian.'
+                        message.data.body = 'Pesanan anda telah ditolak oleh veterinarian.'
                         message.data.screen = 'Order_History_Detail_Customer'
                         break
                     case 4:
-                        message.notification = {
-                            title: 'Pesanan anda telah diprogress oleh veterinarian.',
-                            body: 'Pesanan anda telah diprogress oleh veterinarian.'
-                        }
+                        message.data.title = 'Pesanan anda telah diprogress oleh veterinarian.'
+                        message.data.body = 'Pesanan anda telah diprogress oleh veterinarian.'
                         message.data.screen = 'Order_Detail_Customer'
                         break
                     case 5:
-                        message.notification = {
-                            title: 'Pesanan anda telah diselesaikan oleh veterinarian.',
-                            body: 'Pesanan anda telah diselesaikan oleh veterinarian, silahkan memberikan ratings.'
-                        }
+                        message.data.title = 'Pesanan anda telah diselesaikan oleh veterinarian.'
+                        message.data.body = 'Pesanan anda telah diselesaikan oleh veterinarian, silahkan memberikan ratings.'
                         message.data.screen = 'Order_History_Detail_Customer'
                         break
                 }
                 const options = { priority: 'high' }
+
                 try {
                     await helpers.notification.sendPushNotification(tokens, message, options)
                 } catch (err) {

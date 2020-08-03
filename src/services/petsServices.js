@@ -28,13 +28,17 @@ exports.getPetsList = async (sql, user_id) => {
  */
 exports.getPetsDetail = async (sql, id) => {
     const pets = await repository.pets.getPetsByID(sql, id)
-    let pictures = {}
-    if (pets.picture_id) {
-        pictures = await repository.pictures.getById(sql, pets.picture_id)
-    }
-    const medicalRecords = await repository.pets.getMedicalRecordsByPetID(sql, id)
+    if (!pets) {
+        return { petNotFound: true }
+    } else {
+        let pictures = {}
+        if (pets.picture_id) {
+            pictures = await repository.pictures.getById(sql, pets.picture_id)
+        }
+        const medicalRecords = await repository.pets.getMedicalRecordsByPetID(sql, id)
 
-    return { pets, pictures, medical_records: medicalRecords }
+        return { pets, pictures, medical_records: medicalRecords }
+    }
 }
 
 /**

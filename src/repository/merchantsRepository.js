@@ -92,7 +92,7 @@ exports.getMerchantRatingsByMerchantID = (sql, merchant_id) => {
             `, [merchant_id])
             .then(data => {
                 console.timeEnd('QueryTimeExec')
-                return data.rows ? data.rows : { merchant_id, total_ratings: 0, ratings: 0} 
+                return data.rows ? data.rows : [{ merchant_id, total_ratings: 0, ratings: 0}] 
             })
     } catch (err) {
         throw err

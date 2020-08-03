@@ -43,7 +43,11 @@ exports.getPetsDetail = async (req, res) => {
 
     try {
         const data = await services.pets.getPetsDetail(req.sql, id)
-        return helpers.response(res, 200, 'OK', false, data)
+        if (data.petNotFound) {
+            return helpers.response(res, 404, 'Pet not found.', false, {})
+        } else {
+            return helpers.response(res, 200, 'OK', false, data)   
+        }        
     } catch (err) {
         console.error(err)
         return helpers.response(res, 500, 'Internal server error.', true, {})

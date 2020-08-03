@@ -105,3 +105,31 @@ exports.sendNotification = async (req, res) => {
         return helpers.response(res, 500, 'Internal server error.', true, {})        
     }
 }
+
+exports.sendNewNotification = async (req, res) => {
+    console.log('request body: ', req.body)
+    const { to, screen, order, token } = req.body
+
+    try {
+        const message = {
+            data: {
+                title: 'Ini title dummy new notification.',
+                body: 'Ini title body new notification.',
+                to,
+                screen,
+                order: JSON.stringify(order)
+            }
+        }
+        const options = { priority: 'high' }
+        try {
+            const responsePushNotification = await helpers.notification.sendPushNotification(token, message, options)
+            return helpers.response(res, 200, 'Message sent.', false, responsePushNotification)
+        } catch (err) {
+            console.log('Push Notification error')
+            return helpers.response(res, 400, 'Send push notification error.', true, { err: JSON.stringify(err) })
+        }
+    } catch (err) {
+        console.error(err)
+        return helpers.response(res, 500, 'Internal server error.', true, {})        
+    }
+}

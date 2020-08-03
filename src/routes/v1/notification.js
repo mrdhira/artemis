@@ -15,5 +15,11 @@ module.exports = (fastify, options, next) => {
         handler: (req, res) => controllers.notification.sendNotification(req, res)
     })
 
+    fastify.route({
+        method: 'POST',
+        url: '/new/send',
+        handler: (req, res) => controllers.notification.sendNewNotification(req, res)
+    })
+
     next()
 }

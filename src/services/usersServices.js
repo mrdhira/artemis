@@ -158,7 +158,10 @@ exports.getProfileMerchant = async (sql, id, merchant_id) => {
     if (user.picture_id) {
         pictures = await repository.pictures.getById(sql, user.picture_id)
     }
-    return { user, merchant, merchantServices, pictures }
+
+    const merchantRatings = await repository.merchants.getMerchantRatingsByMerchantID(sql, merchant_id)
+
+    return { user, merchant, merchantServices, pictures, merchantRatings }
 }
 
 /**
